@@ -1,0 +1,32 @@
+[build-system]
+requires = ["setuptools>=61.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "agentic-todolist"
+version = "0.1.0"
+description = "FastAPI backend service for creating Google Calendar events from timeline text"
+readme = "README.md"
+requires-python = ">=3.13"
+dependencies = [
+    "fastapi>=0.104.0",
+    "uvicorn[standard]>=0.24.0",
+    "google-api-python-client>=2.0.0",
+    "google-auth>=2.0.0",
+    "google-auth-oauthlib>=1.0.0",
+    "google-auth-httplib2>=0.2.0",
+    "python-dateutil>=2.8.0",
+    "pydantic>=2.0.0",
+    "python-multipart>=0.0.6",
+    "google-generativeai>=0.8.0",
+    "openai>=1.0.0",
+    "httpx>=0.25.0",
+    "python-dotenv>=1.0.0",
+    "PyJWT>=2.8.0",
+    "fastapi-sso>=0.18.0",
+    "cryptography>=41.0.0",
+]
+
+[tool.setuptools]
+packages = ["app"]
+include-package-data = true
