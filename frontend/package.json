@@ -19,7 +19,6 @@
     "@types/react-dom": "^19.1.7",
     "@vitejs/plugin-react": "^5.0.0",
     "globals": "^16.3.0",
-    "husky": "^9.1.7",
     "lint-staged": "^16.1.5",
     "typescript": "~5.8.3",
     "ultracite": "5.2.4",
