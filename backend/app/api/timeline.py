@@ -222,6 +222,12 @@ async def create_events_from_timeline(
                     "html_link": event["html_link"],
                     "location": event.get("location", ""),
                     "description": event.get("description", ""),
+                    # Add parsed date/time for frontend display
+                    "start_date": event["start"].get("date") or event["start"].get("dateTime", "").split("T")[0] if event.get("start") else "",
+                    "end_date": event["end"].get("date") or event["end"].get("dateTime", "").split("T")[0] if event.get("end") else "",
+                    "start_time": event["start"].get("dateTime", "").split("T")[1][:5] if event.get("start", {}).get("dateTime") else None,
+                    "end_time": event["end"].get("dateTime", "").split("T")[1][:5] if event.get("end", {}).get("dateTime") else None,
+                    "all_day": "date" in event.get("start", {})
                 }
                 for event in created_events
             ],

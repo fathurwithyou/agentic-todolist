@@ -237,17 +237,23 @@ class CalendarService:
         self, date_str: str, time_str: Optional[str] = None
     ) -> datetime:
         """Parse date and time strings into datetime"""
-        # Implementation for parsing date/time strings
-        # This is a simplified version
         try:
             if time_str:
-                datetime_str = f"{date_str} {time_str}"
+                # Handle HH:MM format by adding seconds
+                if ':' in time_str and len(time_str) == 5:
+                    time_str = f"{time_str}:00"
+                datetime_str = f"{date_str}T{time_str}"
                 return datetime.fromisoformat(datetime_str)
             else:
-                return datetime.fromisoformat(f"{date_str} 00:00:00")
-        except ValueError:
-            # Fallback parsing logic
-            return datetime.now()
+                return datetime.fromisoformat(f"{date_str}T00:00:00")
+        except ValueError as e:
+            logger.warning(f"Failed to parse datetime from '{date_str}' and '{time_str}': {e}")
+            # Fallback parsing logic - use just the date at midnight
+            try:
+                return datetime.fromisoformat(f"{date_str}T00:00:00")
+            except ValueError:
+                logger.error(f"Failed to parse date '{date_str}', using current time")
+                return datetime.now()
 
     def _generate_event_id(self) -> str:
         """Generate unique event ID"""

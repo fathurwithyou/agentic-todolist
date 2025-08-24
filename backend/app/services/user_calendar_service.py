@@ -281,17 +281,21 @@ class UserCalendarService:
                 "summary": title,
                 "description": description,
             }
+            
+            # Debug: Log the description being sent
+            logger.info(f"Creating event with description: {repr(description)}")
+            logger.info(f"Description length: {len(description)} characters")
 
             # Set start and end times
             if start_datetime and end_datetime:
                 # Timed event
                 event_data["start"] = {
                     "dateTime": start_datetime.isoformat(),
-                    "timeZone": "UTC",
+                    "timeZone": "Asia/Jakarta",  # Indonesian timezone (WIIB = UTC+7)
                 }
                 event_data["end"] = {
                     "dateTime": end_datetime.isoformat(),
-                    "timeZone": "UTC",
+                    "timeZone": "Asia/Jakarta",  # Indonesian timezone (WIIB = UTC+7)
                 }
             elif start_date:
                 # All-day event
@@ -325,6 +329,9 @@ class UserCalendarService:
             logger.info(
                 f"Created event {created_event['id']} for user {self.user.user_id}"
             )
+            
+            # Debug: Log what Google returned
+            logger.info(f"Google Calendar returned description: {repr(created_event.get('description', ''))}")
 
             return {
                 "id": created_event["id"],
