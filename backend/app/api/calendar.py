@@ -17,21 +17,6 @@ logger = logging.getLogger(__name__)
 router = APIRouter(prefix="/calendar", tags=["calendar"])
 
 
-class CreateEventRequest(BaseModel):
-    """Request to create a single calendar event"""
-
-    title: str
-    description: str = ""
-    start_date: str
-    end_date: str
-    start_time: Optional[str] = None
-    end_time: Optional[str] = None
-    attendees: List[str] = []
-    location: Optional[str] = None
-    all_day: bool = True
-    item_type: str = "event"
-
-
 class GoogleEventResponse(BaseModel):
     """Google Calendar event response"""
 
@@ -84,57 +69,6 @@ class CalendarListResponse(BaseModel):
     primary: bool = False
     access_role: str = ""
     color_id: str = ""
-
-
-@router.post("/create")
-async def create_single_event(
-    request: CreateEventRequest, current_user=Depends(get_current_user)
-):
-    """Create a single calendar event directly in Google Calendar"""
-    try:
-        user_calendar_service = create_user_calendar_service(current_user.user)
-
-        # Parse datetime if provided, otherwise use date
-        start_datetime = None
-        end_datetime = None
-
-        if request.start_time and request.end_time and not request.all_day:
-            start_datetime = datetime.fromisoformat(
-                f"{request.start_date}T{request.start_time}"
-            )
-            end_datetime = datetime.fromisoformat(
-                f"{request.end_date}T{request.end_time}"
-            )
-
-        created_event = user_calendar_service.create_event(
-            title=request.title,
-            description=request.description,
-            start_datetime=start_datetime,
-            end_datetime=end_datetime,
-            start_date=request.start_date if request.all_day else None,
-            end_date=request.end_date if request.all_day else None,
-            attendees=request.attendees,
-            location=request.location,
-        )
-
-        if not created_event:
-            raise HTTPException(status_code=500, detail="Failed to create event")
-
-        return {
-            "success": True,
-            "id": created_event["id"],
-            "summary": created_event["summary"],
-            "item_type": request.item_type,
-            "start": created_event["start"],
-            "end": created_event["end"],
-            "html_link": created_event["html_link"],
-            "location": created_event.get("location", ""),
-            "description": created_event.get("description", ""),
-        }
-
-    except Exception as e:
-        logger.error(f"Single event creation failed: {e}")
-        raise HTTPException(status_code=500, detail="Event creation failed")
 
 
 # Google Calendar Integration Endpoints

@@ -98,8 +98,6 @@ async def root():
             "GET /api/v1/timeline/providers": "Get available timeline providers",
             "POST /api/v1/timeline/preview": "Preview timeline parsing",
             "POST /api/v1/timeline/create-events": "Create events from timeline preview",
-            "POST /api/v1/calendar/create": "Create single calendar event",
-            "GET /api/v1/calendar/events": "Get user's calendar events",
             "GET /api/v1/calendar/google/calendars": "List user's Google Calendars",
             "GET /api/v1/calendar/google/calendars/writable": "List user's writable Google Calendars",
             "GET /api/v1/calendar/google/events": "List user's Google Calendar events",
