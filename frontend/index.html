@@ -277,6 +277,73 @@
             margin-bottom: 15px;
             font-size: 14px;
         }
+        .calendar-item {
+            background-color: white;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 15px 0;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        .calendar-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            color: white;
+            font-weight: bold;
+        }
+        .calendar-info {
+            flex: 1;
+        }
+        .calendar-name {
+            font-size: 18px;
+            font-weight: bold;
+            margin-bottom: 5px;
+            color: #333;
+        }
+        .calendar-details {
+            font-size: 14px;
+            color: #666;
+        }
+        .calendar-badge {
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: bold;
+            margin-right: 8px;
+        }
+        .badge-primary {
+            background-color: #007bff;
+            color: white;
+        }
+        .badge-owner {
+            background-color: #28a745;
+            color: white;
+        }
+        .badge-reader {
+            background-color: #6c757d;
+            color: white;
+        }
+        .refresh-btn {
+            background-color: #17a2b8;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 14px;
+            margin-bottom: 20px;
+        }
+        .refresh-btn:hover {
+            background-color: #138496;
+        }
     </style>
 </head>
 <body>
@@ -313,8 +380,8 @@
         <!-- Main Application (shown when authenticated) -->
         <div id="mainApp" class="hidden">
             <div class="tabs">
-                <button type="button" class="tab active" onclick="switchTab('timeline')">Timeline to Calendar</button>
-                <button type="button" class="tab" onclick="switchTab('create')">Create Single Item</button>
+                <button type="button" class="tab active" onclick="switchTab('timeline')">AI Timeline to Calendar</button>
+                <button type="button" class="tab" onclick="switchTab('calendars')">My Calendars</button>
                 <button type="button" class="tab" onclick="switchTab('apikeys')">API Keys</button>
             </div>
 
@@ -336,6 +403,16 @@
                             </select>
                         </div>
                     </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="targetCalendar">Target Calendar:</label>
+                    <select id="targetCalendar" name="targetCalendar" required>
+                        <option value="primary">Primary Calendar</option>
+                    </select>
+                    <small style="color: #666; font-size: 12px;">
+                        Only calendars you can write to are shown. AI will understand calendar type from timeline text.
+                    </small>
                 </div>
 
             <form id="timelineForm">
@@ -380,67 +457,17 @@ Invite: Fathur, Bimo, Guntara"
             </div>
         </div>
 
-        <!-- Create Item Tab -->
-        <div id="createTab" class="tab-content">
-            <form id="createItemForm">
-            <div class="form-group">
-                <label for="itemType">Type:</label>
-                <select id="itemType" name="itemType" required>
-                    <option value="event">Event</option>
-                    <option value="task">Task</option>
-                    <option value="appointment">Appointment</option>
-                </select>
-            </div>
 
-            <div class="form-group">
-                <label for="title">Title:</label>
-                <input type="text" id="title" name="title" required placeholder="Enter title...">
-            </div>
-
-            <div class="form-group">
-                <label for="description">Description:</label>
-                <textarea id="description" name="description" placeholder="Enter description (optional)..."></textarea>
-            </div>
-
-            <div class="form-row">
-                <div class="form-group">
-                    <label for="startDate">Start Date:</label>
-                    <input type="date" id="startDate" name="startDate" required>
+            <!-- Calendars Tab -->
+            <div id="calendarsTab" class="tab-content">
+                <h3>📅 My Google Calendars</h3>
+                <p>View all your Google Calendar calendars including "Jadwal Lomba", "Jadwal Kuliah", and others.</p>
+                
+                <button id="refreshCalendarsBtn" class="refresh-btn">🔄 Refresh Calendar List</button>
+                
+                <div id="calendarsContainer">
+                    <p>Click "Refresh Calendar List" to load your calendars...</p>
                 </div>
-                <div class="form-group">
-                    <label for="endDate">End Date:</label>
-                    <input type="date" id="endDate" name="endDate" required>
-                </div>
-            </div>
-
-            <div class="form-group checkbox-group">
-                <input type="checkbox" id="allDay" name="allDay" checked>
-                <label for="allDay">All Day</label>
-            </div>
-
-            <div class="form-row time-fields" id="timeFields">
-                <div class="form-group">
-                    <label for="startTime">Start Time:</label>
-                    <input type="time" id="startTime" name="startTime">
-                </div>
-                <div class="form-group">
-                    <label for="endTime">End Time:</label>
-                    <input type="time" id="endTime" name="endTime">
-                </div>
-            </div>
-
-            <div class="form-group">
-                <label for="attendees">Attendees (one per line):</label>
-                <textarea id="attendees" name="attendees" placeholder="Enter attendee names or emails, one per line..."></textarea>
-            </div>
-
-                <button type="submit" id="submitBtn">Create Calendar Item</button>
-            </form>
-
-            <div id="result" class="result">
-                <h3>Create Item Result:</h3>
-                <div id="resultContent"></div>
-            </div>
             </div>
 
             <!-- API Keys Tab -->
@@ -496,15 +523,9 @@ Invite: Fathur, Bimo, Guntara"
         let authToken = null;
         
         // Form elements
-        const createForm = document.getElementById('createItemForm');
         const timelineForm = document.getElementById('timelineForm');
-        const allDayCheckbox = document.getElementById('allDay');
-        const timeFields = document.getElementById('timeFields');
-        const resultDiv = document.getElementById('result');
-        const resultContent = document.getElementById('resultContent');
         const timelineResultDiv = document.getElementById('timelineResult');
         const timelineResultContent = document.getElementById('timelineResultContent');
-        const submitBtn = document.getElementById('submitBtn');
         const timelineSubmitBtn = document.getElementById('timelineSubmitBtn');
 
         // Preview elements
@@ -517,6 +538,7 @@ Invite: Fathur, Bimo, Guntara"
         // Model selection elements
         const timelineProvider = document.getElementById('timelineProvider');
         const timelineModel = document.getElementById('timelineModel');
+        const targetCalendar = document.getElementById('targetCalendar');
         
         // Authentication elements
         const loginSection = document.getElementById('loginSection');
@@ -536,6 +558,10 @@ Invite: Fathur, Bimo, Guntara"
         const apiKeyResult = document.getElementById('apiKeyResult');
         const apiKeyResultContent = document.getElementById('apiKeyResultContent');
         const apiKeyStatus = document.getElementById('apiKeyStatus');
+
+        // Calendar elements
+        const refreshCalendarsBtn = document.getElementById('refreshCalendarsBtn');
+        const calendarsContainer = document.getElementById('calendarsContainer');
 
         // Initialize page
         window.onload = async function() {
@@ -558,11 +584,9 @@ Invite: Fathur, Bimo, Guntara"
                         // Clean up URL
                         window.history.replaceState({}, document.title, window.location.pathname);
                         
-                        // Load providers and set dates
+                        // Load providers and calendars
                         await loadProviders();
-                        const today = new Date().toISOString().split('T')[0];
-                        document.getElementById('startDate').value = today;
-                        document.getElementById('endDate').value = today;
+                        await loadWritableCalendars();
                         return;
                     }
                 } catch (error) {
@@ -574,14 +598,12 @@ Invite: Fathur, Bimo, Guntara"
             // Check authentication status
             await checkAuthStatus();
             
-            // Set default dates
-            const today = new Date().toISOString().split('T')[0];
-            document.getElementById('startDate').value = today;
-            document.getElementById('endDate').value = today;
+            // Authentication check complete
             
             // Load available providers and models if authenticated
             if (currentUser) {
                 await loadProviders();
+                await loadWritableCalendars();
             }
         };
 
@@ -691,7 +713,6 @@ Invite: Fathur, Bimo, Guntara"
             event.target.classList.add('active');
             
             // Hide all results when switching tabs
-            resultDiv.style.display = 'none';
             timelineResultDiv.style.display = 'none';
             previewSection.classList.remove('show');
         }
@@ -750,14 +771,41 @@ Invite: Fathur, Bimo, Guntara"
             }
         });
 
-        // Toggle time fields based on all-day checkbox
-        allDayCheckbox.addEventListener('change', function() {
-            if (this.checked) {
-                timeFields.classList.remove('show');
-            } else {
-                timeFields.classList.add('show');
+        // Load writable calendars for timeline
+        async function loadWritableCalendars() {
+            if (!currentUser || !authToken) return;
+
+            try {
+                const response = await fetch('http://localhost:8000/api/v1/calendar/google/calendars/writable', {
+                    headers: {
+                        'Authorization': `Bearer ${authToken}`
+                    }
+                });
+
+                if (response.ok) {
+                    const calendars = await response.json();
+                    console.log('Loaded writable calendars:', calendars);
+
+                    // Clear existing options except primary
+                    targetCalendar.innerHTML = '<option value="primary">Primary Calendar</option>';
+
+                    calendars.forEach(calendar => {
+                        // Skip primary as it's already added
+                        if (calendar.id !== 'primary') {
+                            const option = document.createElement('option');
+                            option.value = calendar.id;
+                            option.textContent = `${calendar.summary} (${calendar.access_role})`;
+                            targetCalendar.appendChild(option);
+                        }
+                    });
+                } else {
+                    console.warn('Could not load writable calendars');
+                }
+            } catch (error) {
+                console.warn('Error loading writable calendars:', error);
             }
-        });
+        }
+
 
         // Timeline form submission - Preview workflow
         timelineForm.addEventListener('submit', async function(e) {
@@ -775,8 +823,11 @@ Invite: Fathur, Bimo, Guntara"
                 flexible: formData.get('flexible') === 'on',
                 llm_provider: timelineProvider.value || null,
                 llm_model: timelineModel.value || null,
-                user_id: currentUser.user_id
+                target_calendar_id: targetCalendar.value || 'primary'
             };
+            
+            console.log('Timeline preview payload:', payload);
+            console.log('Selected target calendar:', targetCalendar.value);
 
             try {
                 // Call preview endpoint instead of direct creation
@@ -854,7 +905,8 @@ Invite: Fathur, Bimo, Guntara"
                         'Authorization': `Bearer ${authToken}`
                     },
                     body: JSON.stringify({
-                        events: previewData.parsed_events
+                        events: previewData.parsed_events,
+                        target_calendar_id: targetCalendar.value || 'primary'
                     })
                 });
 
@@ -903,65 +955,6 @@ Invite: Fathur, Bimo, Guntara"
             previewData = null;
         });
 
-        // Create item form submission
-        createForm.addEventListener('submit', async function(e) {
-            e.preventDefault();
-            
-            submitBtn.disabled = true;
-            submitBtn.textContent = 'Creating...';
-            resultDiv.style.display = 'none';
-
-            const formData = new FormData(createForm);
-            const attendeesText = formData.get('attendees').trim();
-            const attendees = attendeesText ? attendeesText.split('\n').map(s => s.trim()).filter(s => s) : [];
-
-            const payload = {
-                title: formData.get('title'),
-                description: formData.get('description') || null,
-                start_date: formData.get('startDate'),
-                end_date: formData.get('endDate'),
-                start_time: formData.get('allDay') === 'on' ? null : formData.get('startTime'),
-                end_time: formData.get('allDay') === 'on' ? null : formData.get('endTime'),
-                attendees: attendees,
-                item_type: formData.get('itemType'),
-                all_day: formData.get('allDay') === 'on'
-            };
-
-            try {
-                const response = await fetch('http://localhost:8000/api/v1/calendar/create', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'Authorization': `Bearer ${authToken}`
-                    },
-                    body: JSON.stringify(payload)
-                });
-
-                const result = await response.json();
-
-                if (response.ok) {
-                    resultDiv.className = 'result success';
-                    resultContent.innerHTML = `
-                        <strong>Success!</strong><br>
-                        <strong>ID:</strong> ${result.id}<br>
-                        <strong>Title:</strong> ${result.summary}<br>
-                        <strong>Type:</strong> ${result.item_type}<br>
-                        <strong>Date:</strong> ${result.start_date} to ${result.end_date}<br>
-                        ${result.start_time ? `<strong>Time:</strong> ${result.start_time} - ${result.end_time}<br>` : ''}
-                        ${result.html_link ? `<a href="${result.html_link}" target="_blank">View in Google Calendar</a>` : ''}
-                    `;
-                } else {
-                    throw new Error(result.detail || 'Unknown error');
-                }
-            } catch (error) {
-                resultDiv.className = 'result error';
-                resultContent.innerHTML = `<strong>Error:</strong> ${error.message}`;
-            }
-
-            resultDiv.style.display = 'block';
-            submitBtn.disabled = false;
-            submitBtn.textContent = 'Create Calendar Item';
-        });
 
         // API Key Management Functions
         async function loadApiKeyStatus() {
@@ -1095,6 +1088,87 @@ Invite: Fathur, Bimo, Guntara"
             this.textContent = '🔍 Test API Key';
         });
 
+        // Load Calendar List
+        async function loadCalendars() {
+            if (!currentUser || !authToken) {
+                calendarsContainer.innerHTML = '<p style="color: #dc3545;">Please log in to view your calendars.</p>';
+                return;
+            }
+
+            calendarsContainer.innerHTML = '<p>⏳ Loading calendars...</p>';
+
+            try {
+                const response = await fetch('http://localhost:8000/api/v1/calendar/google/calendars', {
+                    headers: {
+                        'Authorization': `Bearer ${authToken}`
+                    }
+                });
+
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                }
+
+                const calendars = await response.json();
+                console.log('Loaded calendars:', calendars);
+
+                if (calendars.length === 0) {
+                    calendarsContainer.innerHTML = '<p>No calendars found. Make sure you have granted calendar access.</p>';
+                    return;
+                }
+
+                let html = '';
+                calendars.forEach(calendar => {
+                    const colors = ['#4285F4', '#34A853', '#FBBC04', '#EA4335', '#9AA0A6', '#FF6D01', '#46BDC6'];
+                    const colorIndex = parseInt(calendar.color_id || '1') - 1;
+                    const backgroundColor = colors[colorIndex % colors.length];
+                    
+                    const badges = [];
+                    if (calendar.primary) badges.push('<span class="calendar-badge badge-primary">Primary</span>');
+                    if (calendar.access_role === 'owner') badges.push('<span class="calendar-badge badge-owner">Owner</span>');
+                    else if (calendar.access_role === 'reader') badges.push('<span class="calendar-badge badge-reader">Reader</span>');
+
+                    html += `
+                        <div class="calendar-item">
+                            <div class="calendar-icon" style="background-color: ${backgroundColor}">
+                                📅
+                            </div>
+                            <div class="calendar-info">
+                                <div class="calendar-name">${calendar.summary}</div>
+                                <div class="calendar-details">
+                                    ${badges.join(' ')}
+                                    <br>
+                                    <strong>ID:</strong> ${calendar.id}<br>
+                                    ${calendar.description ? `<strong>Description:</strong> ${calendar.description}<br>` : ''}
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                });
+
+                calendarsContainer.innerHTML = html;
+
+            } catch (error) {
+                console.error('Failed to load calendars:', error);
+                calendarsContainer.innerHTML = `
+                    <div style="color: #dc3545; padding: 15px; background-color: #f8d7da; border-radius: 5px;">
+                        <strong>❌ Error loading calendars:</strong> ${error.message}
+                        <br><small>Make sure you have granted calendar access and your token is valid.</small>
+                    </div>
+                `;
+            }
+        }
+
+        // Refresh Calendars Button
+        refreshCalendarsBtn.addEventListener('click', async function() {
+            this.disabled = true;
+            this.textContent = '⏳ Loading...';
+            
+            await loadCalendars();
+            
+            this.disabled = false;
+            this.textContent = '🔄 Refresh Calendar List';
+        });
+
         // Load API key status when switching to API keys tab
         function switchTab(tabName) {
             // Hide all tabs
@@ -1110,13 +1184,17 @@ Invite: Fathur, Bimo, Guntara"
             event.target.classList.add('active');
             
             // Hide all results when switching tabs
-            resultDiv.style.display = 'none';
             timelineResultDiv.style.display = 'none';
             previewSection.classList.remove('show');
             
             // Load API key status when switching to API keys tab
             if (tabName === 'apikeys' && currentUser) {
                 loadApiKeyStatus();
+            }
+            
+            // Load calendars when switching to calendars tab
+            if (tabName === 'calendars' && currentUser) {
+                loadCalendars();
             }
         }
     </script>
