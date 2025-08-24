@@ -425,8 +425,13 @@ Timeline Gemastik
 
 1 Juli–10 Agustus: Masa Submisi Proposal
 11 Agustus–2 September: Penjurian
-8 September: Pengumuman Finalis
-27–30 Oktober: Babak Final
+8 September pukul 10:00: Pengumuman Finalis
+27 Oktober 09:00-17:00: Babak Final Hari 1  
+28 Oktober 13:30-15:30: Presentasi Final
+
+Meeting jadwal:
+15 Juli jam 14:00: Rapat Koordinasi
+20 Juli 10:30-12:00: Review Progress
 
 Invite: Fathur, Bimo, Guntara" 
                         style="height: 200px;"></textarea>
@@ -878,10 +883,26 @@ Invite: Fathur, Bimo, Guntara"
                     ? `<br><strong>Attendees:</strong> ${event.attendees.join(', ')}`
                     : '';
                 
+                // Format date and time display
+                let dateTimeDisplay = `${event.start_date}`;
+                if (event.end_date && event.end_date !== event.start_date) {
+                    dateTimeDisplay += ` to ${event.end_date}`;
+                }
+                
+                // Add time if available
+                if (event.start_time || event.end_time) {
+                    const timeDisplay = event.start_time && event.end_time 
+                        ? `${event.start_time} - ${event.end_time}`
+                        : event.start_time || event.end_time;
+                    dateTimeDisplay += ` (${timeDisplay})`;
+                } else if (event.all_day) {
+                    dateTimeDisplay += ` (All Day)`;
+                }
+                
                 eventsHtml += `
                     <div class="preview-event">
                         <h4>${index + 1}. ${event.title}</h4>
-                        <strong>Date:</strong> ${event.start_date} to ${event.end_date}<br>
+                        <strong>Date & Time:</strong> ${dateTimeDisplay}<br>
                         <strong>Description:</strong> ${event.description}
                         ${attendeesList}
                     </div>
@@ -925,10 +946,26 @@ Invite: Fathur, Bimo, Guntara"
                     `;
                     
                     result.created_events.forEach((event, index) => {
+                        // Format date and time for success display
+                        let dateTimeDisplay = `${event.start_date}`;
+                        if (event.end_date && event.end_date !== event.start_date) {
+                            dateTimeDisplay += ` to ${event.end_date}`;
+                        }
+                        
+                        // Add time if available
+                        if (event.start_time || event.end_time) {
+                            const timeDisplay = event.start_time && event.end_time 
+                                ? `${event.start_time} - ${event.end_time}`
+                                : event.start_time || event.end_time;
+                            dateTimeDisplay += ` (${timeDisplay})`;
+                        } else if (event.all_day) {
+                            dateTimeDisplay += ` (All Day)`;
+                        }
+                        
                         html += `
                             <div style="margin: 10px 0; padding: 10px; background-color: #f0f8f0; border-radius: 3px;">
                                 <strong>${index + 1}. ${event.summary}</strong><br>
-                                <strong>Date:</strong> ${event.start_date} to ${event.end_date}<br>
+                                <strong>Date & Time:</strong> ${dateTimeDisplay}<br>
                                 ${event.html_link ? `<a href="${event.html_link}" target="_blank">🔗 View in Google Calendar</a>` : ''}
                             </div>
                         `;
