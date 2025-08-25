@@ -114,14 +114,22 @@ class UserCalendarService:
         """
         service = self._get_calendar_service()
         if not service:
+            logger.warning(
+                f"No calendar service available for user {self.user.user_id}"
+            )
             return []
 
         try:
             calendars_result = service.calendarList().list().execute()
             calendars = calendars_result.get("items", [])
 
-            return [
-                {
+            logger.info(
+                f"Found {len(calendars)} calendars for user {self.user.user_id}"
+            )
+
+            calendar_list = []
+            for cal in calendars:
+                calendar_info = {
                     "id": cal["id"],
                     "summary": cal.get("summary", ""),
                     "description": cal.get("description", ""),
@@ -129,12 +137,44 @@ class UserCalendarService:
                     "access_role": cal.get("accessRole", ""),
                     "color_id": cal.get("colorId", ""),
                 }
-                for cal in calendars
-            ]
+                calendar_list.append(calendar_info)
+
+                # Log each calendar details
+                logger.info(
+                    f"Calendar: {calendar_info['summary']} (ID: {calendar_info['id']}, "
+                    f"Primary: {calendar_info['primary']}, Access: {calendar_info['access_role']})"
+                )
+
+            logger.info(
+                f"Complete calendar list for user {self.user.user_id}: {calendar_list}"
+            )
+            return calendar_list
 
         except HttpError as e:
             logger.error(f"Error listing calendars for user {self.user.user_id}: {e}")
             return []
+
+    def list_writable_calendars(self) -> List[Dict[str, Any]]:
+        """
+        List only the user's writable Google Calendars (for event creation).
+
+        Returns:
+            List of writable calendar information
+        """
+        all_calendars = self.list_calendars()
+        writable_calendars = [
+            cal for cal in all_calendars if cal["access_role"] in ["owner", "writer"]
+        ]
+
+        logger.info(
+            f"Found {len(writable_calendars)} writable calendars for user {self.user.user_id}"
+        )
+        for cal in writable_calendars:
+            logger.info(
+                f"Writable calendar: {cal['summary']} (ID: {cal['id']}, Access: {cal['access_role']})"
+            )
+
+        return writable_calendars
 
     def list_events(
         self,
@@ -241,17 +281,21 @@ class UserCalendarService:
                 "summary": title,
                 "description": description,
             }
+            
+            # Debug: Log the description being sent
+            logger.info(f"Creating event with description: {repr(description)}")
+            logger.info(f"Description length: {len(description)} characters")
 
             # Set start and end times
             if start_datetime and end_datetime:
                 # Timed event
                 event_data["start"] = {
                     "dateTime": start_datetime.isoformat(),
-                    "timeZone": "UTC",
+                    "timeZone": "Asia/Jakarta",  # Indonesian timezone (WIIB = UTC+7)
                 }
                 event_data["end"] = {
                     "dateTime": end_datetime.isoformat(),
-                    "timeZone": "UTC",
+                    "timeZone": "Asia/Jakarta",  # Indonesian timezone (WIIB = UTC+7)
                 }
             elif start_date:
                 # All-day event
@@ -285,6 +329,9 @@ class UserCalendarService:
             logger.info(
                 f"Created event {created_event['id']} for user {self.user.user_id}"
             )
+            
+            # Debug: Log what Google returned
+            logger.info(f"Google Calendar returned description: {repr(created_event.get('description', ''))}")
 
             return {
                 "id": created_event["id"],

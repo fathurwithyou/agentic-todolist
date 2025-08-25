@@ -75,12 +75,52 @@ class CalendarService:
             raise ValueError(f"Failed to parse timeline: {str(e)}")
 
     def create_calendar_event(
-        self, user_id: str, parsed_event: ParsedEvent
+        self,
+        user_id: str,
+        parsed_event: ParsedEvent,
+        target_calendar_id: str = "primary",
     ) -> CalendarEvent:
         """Create a calendar event from parsed event"""
-        # Convert parsed event to calendar event
+        from ...infrastructure.auth_repository import FileAuthRepository
+        from ...services.user_calendar_service import UserCalendarService
+
+        # Get user and create Google Calendar event
+        auth_repository = FileAuthRepository()
+        user = auth_repository.get_user(user_id)
+        if not user:
+            raise ValueError(f"User {user_id} not found")
+
+        user_calendar_service = UserCalendarService(user, auth_repository)
+
+        # Create event in Google Calendar using the target calendar
+        google_event = user_calendar_service.create_event(
+            title=parsed_event.title,
+            description=parsed_event.description,
+            start_date=parsed_event.start_date if parsed_event.all_day else None,
+            end_date=parsed_event.end_date if parsed_event.all_day else None,
+            start_datetime=self._parse_datetime(
+                parsed_event.start_date, parsed_event.start_time
+            )
+            if not parsed_event.all_day
+            else None,
+            end_datetime=self._parse_datetime(
+                parsed_event.end_date, parsed_event.end_time
+            )
+            if not parsed_event.all_day
+            else None,
+            attendees=parsed_event.attendees or [],
+            location=parsed_event.location,
+            calendar_id=target_calendar_id,
+        )
+
+        if not google_event:
+            raise ValueError(
+                f"Failed to create Google Calendar event: {parsed_event.title}"
+            )
+
+        # Convert Google Calendar event to our CalendarEvent model
         event = CalendarEvent(
-            event_id=self._generate_event_id(),
+            event_id=google_event["id"],
             user_id=user_id,
             title=parsed_event.title,
             description=parsed_event.description,
@@ -94,23 +134,32 @@ class CalendarService:
             location=parsed_event.location,
             all_day=parsed_event.all_day,
             event_type=EventType.EVENT,
+            google_event_id=google_event["id"],
+            html_link=google_event.get("html_link"),
         )
 
         # Save to repository
         saved_event = self.repository.save_event(event)
-        logger.info(f"Created calendar event {event.event_id} for user {user_id}")
+        logger.info(
+            f"Created Google Calendar event {event.event_id} in calendar '{target_calendar_id}' for user {user_id}"
+        )
 
         return saved_event
 
     def create_calendar_events(
-        self, user_id: str, parsed_events: List[ParsedEvent]
+        self,
+        user_id: str,
+        parsed_events: List[ParsedEvent],
+        target_calendar_id: str = "primary",
     ) -> List[CalendarEvent]:
         """Create multiple calendar events"""
         created_events = []
 
         for parsed_event in parsed_events:
             try:
-                event = self.create_calendar_event(user_id, parsed_event)
+                event = self.create_calendar_event(
+                    user_id, parsed_event, target_calendar_id
+                )
                 created_events.append(event)
             except Exception as e:
                 logger.error(f"Failed to create event '{parsed_event.title}': {e}")
@@ -188,17 +237,23 @@ class CalendarService:
         self, date_str: str, time_str: Optional[str] = None
     ) -> datetime:
         """Parse date and time strings into datetime"""
-        # Implementation for parsing date/time strings
-        # This is a simplified version
         try:
             if time_str:
-                datetime_str = f"{date_str} {time_str}"
+                # Handle HH:MM format by adding seconds
+                if ':' in time_str and len(time_str) == 5:
+                    time_str = f"{time_str}:00"
+                datetime_str = f"{date_str}T{time_str}"
                 return datetime.fromisoformat(datetime_str)
             else:
-                return datetime.fromisoformat(f"{date_str} 00:00:00")
-        except ValueError:
-            # Fallback parsing logic
-            return datetime.now()
+                return datetime.fromisoformat(f"{date_str}T00:00:00")
+        except ValueError as e:
+            logger.warning(f"Failed to parse datetime from '{date_str}' and '{time_str}': {e}")
+            # Fallback parsing logic - use just the date at midnight
+            try:
+                return datetime.fromisoformat(f"{date_str}T00:00:00")
+            except ValueError:
+                logger.error(f"Failed to parse date '{date_str}', using current time")
+                return datetime.now()
 
     def _generate_event_id(self) -> str:
         """Generate unique event ID"""

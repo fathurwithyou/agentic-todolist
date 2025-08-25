@@ -45,14 +45,18 @@ TIMELINE TEXT:
 {timeline_text}
 
 INSTRUCTIONS:
-1. Extract all events with dates and titles
+1. Extract all events with dates, times, and titles
 2. Handle both single dates (e.g., "8 September") and date ranges (e.g., "1 Juli–10 Agustus")
-3. Extract any invited participants mentioned (look for "Invite:", "Participants:", etc.)
-4. Convert all dates to ISO format (YYYY-MM-DD)
-5. If no year is mentioned, assume current year ({datetime.now().year})
-6. Handle multiple languages (Indonesian, English, etc.)
-7. For date ranges, use start date and end date
-8. For single dates, use the same date for both start and end
+3. Extract any time information (e.g., "09:00", "13:30-15:00", "pukul 14:00")
+4. Extract any invited participants mentioned (look for "Invite:", "Participants:", etc.)
+5. Convert all dates to ISO format (YYYY-MM-DD)
+6. Convert times to 24-hour format (HH:MM)
+7. If no year is mentioned, assume current year ({datetime.now().year})
+8. Handle multiple languages (Indonesian, English, etc.)
+9. For date ranges, use start date and end date
+10. For single dates, use the same date for both start and end
+11. If times are provided, extract start_time and end_time; if only one time, use as start_time
+12. Accept various time formats: "09:00", "9 AM", "pukul 14:00", "jam 15:30"
 
 REQUIRED OUTPUT FORMAT (JSON only, no other text):
 {{
@@ -60,26 +64,20 @@ REQUIRED OUTPUT FORMAT (JSON only, no other text):
     {{
       "title": "Event Title",
       "start_date": "YYYY-MM-DD",
-      "end_date": "YYYY-MM-DD", 
-      "description": "Original event line from timeline",
-      "attendees": ["Name1", "Name2"]
+      "end_date": "YYYY-MM-DD",
+      "start_time": "HH:MM",
+      "end_time": "HH:MM",
+      "description": "Formatted description, get all information you can",
+      "attendees": ["Name1", "Name2"],
+      "all_day": false
     }}
   ]
 }}
 
-MONTH MAPPINGS:
-- januari/jan = January
-- februari/feb = February  
-- maret/mar = March
-- april/apr = April
-- mei = May
-- juni/jun = June
-- juli/jul = July
-- agustus/agu = August
-- september/sep = September
-- oktober/okt = October
-- november/nov = November
-- desember/des = December
+IMPORTANT NOTES:
+- If no times are specified, set "all_day": true and omit start_time/end_time
+- If only one time is given, use it for start_time and estimate end_time (add 1 hour)
+- For time ranges like "13:30-15:00", extract both start_time and end_time
 
 Parse the timeline and return only the JSON response:
 """

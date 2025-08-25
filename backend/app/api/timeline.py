@@ -50,6 +50,7 @@ class TimelineRequest(BaseModel):
     flexible: bool = True
     llm_provider: Optional[str] = None
     llm_model: Optional[str] = None
+    target_calendar_id: str = "primary"
 
 
 class ParsedEventResponse(BaseModel):
@@ -80,6 +81,7 @@ class CreateEventsRequest(BaseModel):
     """Request to create multiple events from preview"""
 
     events: List[ParsedEventResponse]
+    target_calendar_id: str = "primary"
 
 
 @router.get("/providers")
@@ -101,6 +103,7 @@ async def preview_timeline(
     request: TimelineRequest, current_user=Depends(get_current_user)
 ):
     """Preview timeline parsing without creating calendar events"""
+
     try:
         # Create timeline parse request
         parse_request = TimelineParseRequest(
@@ -109,6 +112,7 @@ async def preview_timeline(
             flexible=request.flexible,
             provider=request.llm_provider,
             model=request.llm_model,
+            target_calendar_id=request.target_calendar_id,
         )
 
         # Parse timeline using domain service
@@ -150,7 +154,12 @@ async def create_events_from_timeline(
     request: CreateEventsRequest, current_user=Depends(get_current_user)
 ):
     """Create calendar events from previewed timeline data directly in Google Calendar"""
+
     try:
+        logger.info(
+            f"🎯 Creating events (timeline.py) - User: {current_user.user.user_id}, Calendar: '{request.target_calendar_id}', Events: {len(request.events)}"
+        )
+
         # Get user's calendar service
         user_calendar_service = create_user_calendar_service(current_user.user)
 
@@ -183,6 +192,7 @@ async def create_events_from_timeline(
                     end_date=event.end_date if not end_datetime else None,
                     attendees=event.attendees,
                     location=event.location,
+                    calendar_id=request.target_calendar_id,
                 )
 
                 if created_event:
@@ -212,6 +222,12 @@ async def create_events_from_timeline(
                     "html_link": event["html_link"],
                     "location": event.get("location", ""),
                     "description": event.get("description", ""),
+                    # Add parsed date/time for frontend display
+                    "start_date": event["start"].get("date") or event["start"].get("dateTime", "").split("T")[0] if event.get("start") else "",
+                    "end_date": event["end"].get("date") or event["end"].get("dateTime", "").split("T")[0] if event.get("end") else "",
+                    "start_time": event["start"].get("dateTime", "").split("T")[1][:5] if event.get("start", {}).get("dateTime") else None,
+                    "end_time": event["end"].get("dateTime", "").split("T")[1][:5] if event.get("end", {}).get("dateTime") else None,
+                    "all_day": "date" in event.get("start", {})
                 }
                 for event in created_events
             ],

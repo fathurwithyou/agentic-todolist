@@ -71,6 +71,7 @@ class TimelineParseRequest:
     flexible: bool = True
     provider: Optional[str] = None
     model: Optional[str] = None
+    target_calendar_id: str = "primary"
 
 
 @dataclass
