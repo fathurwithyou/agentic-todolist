@@ -7,7 +7,10 @@ import logging
 from typing import List
 
 from app.providers.base import LLMProvider
-from app.domains.calendar.models import ParsedEvent
+from app.domains.calendar.models import (
+    ParsedEvent, EventStatus, EventVisibility, EventTransparency,
+    ConferenceData, ConferenceEntryPoint, Reminders, Person, Attendee
+)
 
 logger = logging.getLogger(__name__)
 
@@ -86,6 +89,60 @@ class OpenAIProvider(LLMProvider):
             logger.info(f"Found {len(events_list)} events in response")
 
             for event_data in events_list:
+                # Parse status
+                status_str = event_data.get("status", "confirmed")
+                status = EventStatus.CONFIRMED
+                if status_str == "tentative":
+                    status = EventStatus.TENTATIVE
+                elif status_str == "cancelled":
+                    status = EventStatus.CANCELLED
+                
+                # Parse visibility
+                visibility_str = event_data.get("visibility", "default")
+                visibility = EventVisibility.DEFAULT
+                if visibility_str == "public":
+                    visibility = EventVisibility.PUBLIC
+                elif visibility_str == "private":
+                    visibility = EventVisibility.PRIVATE
+                
+                # Parse transparency
+                transparency_str = event_data.get("transparency", "opaque")
+                transparency = EventTransparency.OPAQUE
+                if transparency_str == "transparent":
+                    transparency = EventTransparency.TRANSPARENT
+                
+                # Parse conference data
+                conference_data = None
+                conference_raw = event_data.get("conferenceData")
+                if conference_raw:
+                    entry_points = []
+                    for ep_data in conference_raw.get("entryPoints", []):
+                        entry_point = ConferenceEntryPoint(
+                            entryPointType=ep_data.get("entryPointType", "video"),
+                            uri=ep_data.get("uri"),
+                            label=ep_data.get("label"),
+                            pin=ep_data.get("pin"),
+                            accessCode=ep_data.get("accessCode"),
+                            meetingCode=ep_data.get("meetingCode"),
+                            passcode=ep_data.get("passcode"),
+                            password=ep_data.get("password")
+                        )
+                        entry_points.append(entry_point)
+                    
+                    conference_data = ConferenceData(
+                        conferenceId=conference_raw.get("conferenceId"),
+                        entryPoints=entry_points,
+                        signature=conference_raw.get("signature"),
+                        notes=conference_raw.get("notes")
+                    )
+                
+                # Parse reminders
+                reminders_data = event_data.get("reminders", {"useDefault": True})
+                reminders = Reminders(
+                    useDefault=reminders_data.get("useDefault", True),
+                    overrides=[]  # Could be extended to parse overrides
+                )
+                
                 parsed_event = ParsedEvent(
                     title=event_data["title"],
                     start_date=event_data["start_date"],
@@ -96,6 +153,14 @@ class OpenAIProvider(LLMProvider):
                     end_time=event_data.get("end_time"),
                     location=event_data.get("location"),
                     all_day=event_data.get("all_day", True),
+                    status=status,
+                    visibility=visibility,
+                    transparency=transparency,
+                    colorId=event_data.get("colorId"),
+                    recurrence=event_data.get("recurrence", []),
+                    reminders=reminders,
+                    conferenceData=conference_data,
+                    sequence=event_data.get("sequence", 0)
                 )
                 parsed_events.append(parsed_event)
 
