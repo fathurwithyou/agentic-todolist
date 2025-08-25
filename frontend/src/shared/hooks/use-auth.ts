@@ -153,6 +153,11 @@ export const useAuth = () => {
 				},
 			);
 		}
+
+    setState((prev) => ({
+      ...prev,
+      isLoading: false,
+    }));
 	}, []);
 
 	return {
