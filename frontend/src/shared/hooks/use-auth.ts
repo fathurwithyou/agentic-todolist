@@ -3,6 +3,7 @@ import { toast } from "sonner";
 import type { VerifyTokenResponse } from "../repositories/auth/dto";
 import {
 	useLoginWithGoogleMutation,
+	useLogoutMutation,
 	useVerifyTokenMutation,
 } from "../repositories/auth/query";
 import type { User } from "../types";
@@ -34,6 +35,7 @@ export const useAuth = () => {
 		useLoginWithGoogleMutation();
 	const { mutate: verifyToken, isPending: isLoadingVerifyToken } =
 		useVerifyTokenMutation();
+	const { mutate: removeSession } = useLogoutMutation();
 
 	const handleGoogleLogin = () => {
 		loginWithGoogle(undefined, {
@@ -46,6 +48,13 @@ export const useAuth = () => {
 	};
 
 	const logout = () => {
+		setState((prev) => ({
+			...prev,
+			isLoading: true,
+		}));
+
+		removeSession(undefined);
+
 		localStorage.removeItem("token");
 		setState({
 			isAuthenticated: false,
