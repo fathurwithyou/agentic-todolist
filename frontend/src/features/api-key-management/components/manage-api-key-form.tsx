@@ -91,28 +91,24 @@ export default function ManageApiKeyForm() {
 				)}
 
 				<div className="grid grid-cols-2 gap-2 md:flex">
-					{providers && (
-						<Button
-							onClick={onTestHandler}
-							type="button"
-							className="flex-1"
-							variant="secondary"
-							disabled={isTestApiKeyPending}
-						>
-							{isTestApiKeyPending && <LoaderCircle className="animate-spin" />}
-							Test
-						</Button>
-					)}
-					{apiKey && (
-						<Button
-							type="submit"
-							className="flex-1"
-							disabled={isSaveApiKeyPending}
-						>
-							{isSaveApiKeyPending && <LoaderCircle className="animate-spin" />}
-							Save
-						</Button>
-					)}
+					<Button
+						onClick={onTestHandler}
+						type="button"
+						className="flex-1"
+						variant="secondary"
+						disabled={isTestApiKeyPending || !providers}
+					>
+						{isTestApiKeyPending && <LoaderCircle className="animate-spin" />}
+						Test
+					</Button>
+					<Button
+						type="submit"
+						className="flex-1"
+						disabled={isSaveApiKeyPending || !apiKey}
+					>
+						{isSaveApiKeyPending && <LoaderCircle className="animate-spin" />}
+						Save
+					</Button>
 				</div>
 			</form>
 		</Form>
