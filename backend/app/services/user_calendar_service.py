@@ -10,6 +10,7 @@ from googleapiclient.discovery import build
 from googleapiclient.errors import HttpError
 
 from ..domains.auth.models import User
+from ..domains.calendar.models import ParsedEvent
 from ..services.google_oauth_service import google_oauth_service
 from ..infrastructure.auth_repository import FileAuthRepository
 
@@ -151,6 +152,11 @@ class UserCalendarService:
             return calendar_list
 
         except HttpError as e:
+            if e.resp.status == 304:
+                logger.info(
+                    f"Calendar list not modified (304) for user {self.user.user_id}"
+                )
+                return []
             logger.error(f"Error listing calendars for user {self.user.user_id}: {e}")
             return []
 
@@ -239,6 +245,11 @@ class UserCalendarService:
             ]
 
         except HttpError as e:
+            if e.resp.status == 304:
+                logger.info(
+                    f"Events list not modified (304) for user {self.user.user_id}"
+                )
+                return []
             logger.error(f"Error listing events for user {self.user.user_id}: {e}")
             return []
 
@@ -281,7 +292,7 @@ class UserCalendarService:
                 "summary": title,
                 "description": description,
             }
-            
+
             # Debug: Log the description being sent
             logger.info(f"Creating event with description: {repr(description)}")
             logger.info(f"Description length: {len(description)} characters")
@@ -329,9 +340,11 @@ class UserCalendarService:
             logger.info(
                 f"Created event {created_event['id']} for user {self.user.user_id}"
             )
-            
+
             # Debug: Log what Google returned
-            logger.info(f"Google Calendar returned description: {repr(created_event.get('description', ''))}")
+            logger.info(
+                f"Google Calendar returned description: {repr(created_event.get('description', ''))}"
+            )
 
             return {
                 "id": created_event["id"],
@@ -346,6 +359,11 @@ class UserCalendarService:
             }
 
         except HttpError as e:
+            if e.resp.status == 304:
+                logger.warning(
+                    f"Event not modified (304) during creation for user {self.user.user_id}"
+                )
+                return None
             logger.error(f"Error creating event for user {self.user.user_id}: {e}")
             return None
 
@@ -443,6 +461,11 @@ class UserCalendarService:
             }
 
         except HttpError as e:
+            if e.resp.status == 304:
+                logger.info(
+                    f"Event {event_id} not modified (304) for user {self.user.user_id}"
+                )
+                return None
             logger.error(
                 f"Error updating event {event_id} for user {self.user.user_id}: {e}"
             )
@@ -469,10 +492,153 @@ class UserCalendarService:
             return True
 
         except HttpError as e:
+            if e.resp.status == 304:
+                logger.warning(
+                    f"Event {event_id} not modified (304) during deletion for user {self.user.user_id}"
+                )
+                return False
             logger.error(
                 f"Error deleting event {event_id} for user {self.user.user_id}: {e}"
             )
             return False
+
+    def create_event_from_parsed(
+        self, parsed_event: ParsedEvent, calendar_id: str = "primary"
+    ) -> Optional[Dict[str, Any]]:
+        """
+        Create an event from a ParsedEvent object with full Google Calendar API support.
+
+        Args:
+            parsed_event: ParsedEvent with all the fields parsed from timeline
+            calendar_id: Calendar ID to create the event in
+
+        Returns:
+            Created event data or None if failed
+        """
+        service = self._get_calendar_service()
+        if not service:
+            return None
+
+        try:
+            # Build event data for Google Calendar API
+            event_data = {
+                "summary": parsed_event.title,
+                "description": parsed_event.description,
+                "status": parsed_event.status.value,
+                "visibility": parsed_event.visibility.value,
+                "transparency": parsed_event.transparency.value,
+            }
+
+            # Set start and end times
+            if parsed_event.all_day:
+                # All-day event
+                event_data["start"] = {"date": parsed_event.start_date}
+                event_data["end"] = {"date": parsed_event.end_date}
+            else:
+                # Timed event - construct datetime strings
+                start_datetime = (
+                    f"{parsed_event.start_date}T{parsed_event.start_time or '00:00:00'}"
+                )
+                end_datetime = (
+                    f"{parsed_event.end_date}T{parsed_event.end_time or '23:59:59'}"
+                )
+
+                event_data["start"] = {
+                    "dateTime": start_datetime,
+                    "timeZone": "Asia/Jakarta",
+                }
+                event_data["end"] = {
+                    "dateTime": end_datetime,
+                    "timeZone": "Asia/Jakarta",
+                }
+
+            # Add location
+            if parsed_event.location:
+                event_data["location"] = parsed_event.location
+
+            # Add attendees
+            if parsed_event.attendees:
+                event_data["attendees"] = [
+                    {"email": email} for email in parsed_event.attendees
+                ]
+
+            # Add recurrence rules
+            if parsed_event.recurrence:
+                event_data["recurrence"] = parsed_event.recurrence
+
+            # Add reminders
+            if parsed_event.reminders:
+                reminders_data = {"useDefault": parsed_event.reminders.useDefault}
+                if parsed_event.reminders.overrides:
+                    reminders_data["overrides"] = [
+                        {"method": override.method, "minutes": override.minutes}
+                        for override in parsed_event.reminders.overrides
+                    ]
+                event_data["reminders"] = reminders_data
+
+            # Add conference data
+            if parsed_event.conferenceData and parsed_event.conferenceData.entryPoints:
+                conference_data = {}
+                entry_points = []
+                for ep in parsed_event.conferenceData.entryPoints:
+                    entry_point = {"entryPointType": ep.entryPointType}
+                    if ep.uri:
+                        entry_point["uri"] = ep.uri
+                    if ep.label:
+                        entry_point["label"] = ep.label
+                    entry_points.append(entry_point)
+
+                conference_data["entryPoints"] = entry_points
+                if parsed_event.conferenceData.conferenceId:
+                    conference_data["conferenceId"] = (
+                        parsed_event.conferenceData.conferenceId
+                    )
+
+                event_data["conferenceData"] = conference_data
+
+            # Add color ID
+            if parsed_event.colorId:
+                event_data["colorId"] = parsed_event.colorId
+
+            # Log the event data being sent
+            logger.info(f"Creating event with data: {event_data}")
+
+            # Create the event
+            created_event = (
+                service.events()
+                .insert(
+                    calendarId=calendar_id,
+                    body=event_data,
+                    sendUpdates="all" if parsed_event.attendees else "none",
+                )
+                .execute()
+            )
+
+            logger.info(
+                f"Created event {created_event['id']} for user {self.user.user_id} with title: {parsed_event.title}"
+            )
+
+            return {
+                "id": created_event["id"],
+                "summary": created_event.get("summary", ""),
+                "description": created_event.get("description", ""),
+                "start": created_event.get("start", {}),
+                "end": created_event.get("end", {}),
+                "location": created_event.get("location", ""),
+                "attendees": created_event.get("attendees", []),
+                "html_link": created_event.get("htmlLink", ""),
+                "status": created_event.get("status", ""),
+                "recurrence": created_event.get("recurrence", []),
+                "reminders": created_event.get("reminders", {}),
+                "conferenceData": created_event.get("conferenceData", {}),
+            }
+
+        except HttpError as e:
+            logger.error(
+                f"Error creating event from parsed data for user {self.user.user_id}: {e}"
+            )
+            logger.error(f"Event data was: {event_data}")
+            return None
 
 
 def create_user_calendar_service(user: User) -> UserCalendarService:

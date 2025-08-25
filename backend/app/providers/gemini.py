@@ -9,8 +9,13 @@ from typing import List
 
 from app.providers.base import LLMProvider
 from app.domains.calendar.models import (
-    ParsedEvent, EventStatus, EventVisibility, EventTransparency,
-    ConferenceData, ConferenceEntryPoint, Reminders, Person, Attendee
+    ParsedEvent,
+    EventStatus,
+    EventVisibility,
+    EventTransparency,
+    ConferenceData,
+    ConferenceEntryPoint,
+    Reminders,
 )
 
 logger = logging.getLogger(__name__)
@@ -102,7 +107,7 @@ class GeminiProvider(LLMProvider):
 
             for i, event_data in enumerate(events_list):
                 logger.debug(f"Processing event {i + 1}: {event_data}")
-                
+
                 # Parse status
                 status_str = event_data.get("status", "confirmed")
                 status = EventStatus.CONFIRMED
@@ -110,7 +115,7 @@ class GeminiProvider(LLMProvider):
                     status = EventStatus.TENTATIVE
                 elif status_str == "cancelled":
                     status = EventStatus.CANCELLED
-                
+
                 # Parse visibility
                 visibility_str = event_data.get("visibility", "default")
                 visibility = EventVisibility.DEFAULT
@@ -118,13 +123,13 @@ class GeminiProvider(LLMProvider):
                     visibility = EventVisibility.PUBLIC
                 elif visibility_str == "private":
                     visibility = EventVisibility.PRIVATE
-                
+
                 # Parse transparency
                 transparency_str = event_data.get("transparency", "opaque")
                 transparency = EventTransparency.OPAQUE
                 if transparency_str == "transparent":
                     transparency = EventTransparency.TRANSPARENT
-                
+
                 # Parse conference data
                 conference_data = None
                 conference_raw = event_data.get("conferenceData")
@@ -139,24 +144,24 @@ class GeminiProvider(LLMProvider):
                             accessCode=ep_data.get("accessCode"),
                             meetingCode=ep_data.get("meetingCode"),
                             passcode=ep_data.get("passcode"),
-                            password=ep_data.get("password")
+                            password=ep_data.get("password"),
                         )
                         entry_points.append(entry_point)
-                    
+
                     conference_data = ConferenceData(
                         conferenceId=conference_raw.get("conferenceId"),
                         entryPoints=entry_points,
                         signature=conference_raw.get("signature"),
-                        notes=conference_raw.get("notes")
+                        notes=conference_raw.get("notes"),
                     )
-                
+
                 # Parse reminders
                 reminders_data = event_data.get("reminders", {"useDefault": True})
                 reminders = Reminders(
                     useDefault=reminders_data.get("useDefault", True),
-                    overrides=[]  # Could be extended to parse overrides
+                    overrides=[],  # Could be extended to parse overrides
                 )
-                
+
                 parsed_event = ParsedEvent(
                     title=event_data["title"],
                     start_date=event_data["start_date"],
@@ -174,7 +179,7 @@ class GeminiProvider(LLMProvider):
                     recurrence=event_data.get("recurrence", []),
                     reminders=reminders,
                     conferenceData=conference_data,
-                    sequence=event_data.get("sequence", 0)
+                    sequence=event_data.get("sequence", 0),
                 )
                 parsed_events.append(parsed_event)
                 logger.info(

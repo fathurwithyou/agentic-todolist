@@ -19,6 +19,7 @@ class EventType(Enum):
 
 class EventStatus(Enum):
     """Event status values"""
+
     CONFIRMED = "confirmed"
     TENTATIVE = "tentative"
     CANCELLED = "cancelled"
@@ -26,6 +27,7 @@ class EventStatus(Enum):
 
 class EventVisibility(Enum):
     """Event visibility values"""
+
     DEFAULT = "default"
     PUBLIC = "public"
     PRIVATE = "private"
@@ -33,12 +35,14 @@ class EventVisibility(Enum):
 
 class EventTransparency(Enum):
     """Event transparency values"""
+
     OPAQUE = "opaque"
     TRANSPARENT = "transparent"
 
 
 class AttendeeResponseStatus(Enum):
     """Attendee response status values"""
+
     NEEDS_ACTION = "needsAction"
     DECLINED = "declined"
     TENTATIVE = "tentative"
@@ -48,6 +52,7 @@ class AttendeeResponseStatus(Enum):
 @dataclass
 class EventDateTime:
     """Event start/end datetime"""
+
     date: Optional[str] = None  # For all-day events (YYYY-MM-DD)
     dateTime: Optional[str] = None  # For timed events (ISO 8601)
     timeZone: Optional[str] = None
@@ -56,6 +61,7 @@ class EventDateTime:
 @dataclass
 class Person:
     """Person (creator/organizer)"""
+
     id: Optional[str] = None
     email: Optional[str] = None
     displayName: Optional[str] = None
@@ -65,6 +71,7 @@ class Person:
 @dataclass
 class Attendee:
     """Event attendee"""
+
     id: Optional[str] = None
     email: Optional[str] = None
     displayName: Optional[str] = None
@@ -80,6 +87,7 @@ class Attendee:
 @dataclass
 class ReminderOverride:
     """Custom reminder override"""
+
     method: str  # "email" or "popup"
     minutes: int  # Minutes before event
 
@@ -87,6 +95,7 @@ class ReminderOverride:
 @dataclass
 class Reminders:
     """Event reminders"""
+
     useDefault: bool = True
     overrides: List[ReminderOverride] = field(default_factory=list)
 
@@ -94,6 +103,7 @@ class Reminders:
 @dataclass
 class ConferenceEntryPoint:
     """Conference entry point"""
+
     entryPointType: str  # "video", "phone", "sip", "more"
     uri: Optional[str] = None
     label: Optional[str] = None
@@ -107,6 +117,7 @@ class ConferenceEntryPoint:
 @dataclass
 class ConferenceSolution:
     """Conference solution details"""
+
     key: Dict[str, str]  # {"type": "hangoutsMeet"}
     name: Optional[str] = None
     iconUri: Optional[str] = None
@@ -115,6 +126,7 @@ class ConferenceSolution:
 @dataclass
 class ConferenceData:
     """Conference data"""
+
     createRequest: Optional[Dict[str, Any]] = None
     entryPoints: List[ConferenceEntryPoint] = field(default_factory=list)
     conferenceSolution: Optional[ConferenceSolution] = None
@@ -126,6 +138,7 @@ class ConferenceData:
 @dataclass
 class Attachment:
     """Event attachment"""
+
     fileUrl: str
     title: Optional[str] = None
     mimeType: Optional[str] = None
@@ -146,7 +159,7 @@ class ParsedEvent:
     attendees: List[str] = field(default_factory=list)
     location: Optional[str] = None
     all_day: bool = True
-    
+
     # Additional Google Calendar fields
     status: EventStatus = EventStatus.CONFIRMED
     visibility: EventVisibility = EventVisibility.DEFAULT
@@ -159,7 +172,7 @@ class ParsedEvent:
     creator: Optional[Person] = None
     organizer: Optional[Person] = None
     sequence: int = 0
-    
+
     def __post_init__(self):
         if self.reminders is None:
             self.reminders = Reminders()
@@ -174,46 +187,46 @@ class CalendarEvent:
     user_id: str
     title: str  # summary in Google API
     description: str
-    
+
     # Temporal properties
     start: EventDateTime
     end: EventDateTime
     all_day: bool = False
-    
+
     # Participants
     attendees: List[Attendee] = field(default_factory=list)
     creator: Optional[Person] = None
     organizer: Optional[Person] = None
-    
+
     # Location and conferencing
     location: Optional[str] = None
     conferenceData: Optional[ConferenceData] = None
-    
+
     # Event metadata
     status: EventStatus = EventStatus.CONFIRMED
     visibility: EventVisibility = EventVisibility.DEFAULT
     transparency: EventTransparency = EventTransparency.OPAQUE
     colorId: Optional[str] = None
     event_type: EventType = EventType.EVENT
-    
+
     # Recurrence
     recurrence: List[str] = field(default_factory=list)
     recurringEventId: Optional[str] = None
     originalStartTime: Optional[EventDateTime] = None
-    
+
     # Notifications
     reminders: Optional[Reminders] = None
-    
+
     # Attachments
     attachments: List[Attachment] = field(default_factory=list)
-    
+
     # Google Calendar specific
     google_event_id: Optional[str] = None  # id in Google API
     etag: Optional[str] = None
     html_link: Optional[str] = None
     iCalUID: Optional[str] = None
     sequence: int = 0
-    
+
     # System metadata
     created_at: Optional[datetime] = None
     updated_at: Optional[datetime] = None

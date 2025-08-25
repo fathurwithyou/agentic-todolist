@@ -240,14 +240,16 @@ class CalendarService:
         try:
             if time_str:
                 # Handle HH:MM format by adding seconds
-                if ':' in time_str and len(time_str) == 5:
+                if ":" in time_str and len(time_str) == 5:
                     time_str = f"{time_str}:00"
                 datetime_str = f"{date_str}T{time_str}"
                 return datetime.fromisoformat(datetime_str)
             else:
                 return datetime.fromisoformat(f"{date_str}T00:00:00")
         except ValueError as e:
-            logger.warning(f"Failed to parse datetime from '{date_str}' and '{time_str}': {e}")
+            logger.warning(
+                f"Failed to parse datetime from '{date_str}' and '{time_str}': {e}"
+            )
             # Fallback parsing logic - use just the date at midnight
             try:
                 return datetime.fromisoformat(f"{date_str}T00:00:00")
