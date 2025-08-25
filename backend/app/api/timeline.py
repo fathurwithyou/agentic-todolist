@@ -66,6 +66,16 @@ class ParsedEventResponse(BaseModel):
     location: Optional[str] = None
     all_day: bool = True
 
+    # Additional Google Calendar fields
+    status: str = "confirmed"
+    visibility: str = "default"
+    transparency: str = "opaque"
+    colorId: Optional[str] = None
+    recurrence: List[str] = []
+    reminders: Optional[dict] = None
+    conferenceData: Optional[dict] = None
+    sequence: int = 0
+
 
 class TimelinePreviewResponse(BaseModel):
     """Timeline preview response"""
@@ -130,6 +140,16 @@ async def preview_timeline(
                 attendees=event.attendees,
                 location=event.location,
                 all_day=event.all_day,
+                status=event.status.value,
+                visibility=event.visibility.value,
+                transparency=event.transparency.value,
+                colorId=event.colorId,
+                recurrence=event.recurrence,
+                reminders={"useDefault": event.reminders.useDefault}
+                if event.reminders
+                else None,
+                conferenceData=None,  # Simplified for now
+                sequence=event.sequence,
             )
             for event in result.events
         ]
@@ -169,29 +189,58 @@ async def create_events_from_timeline(
         # Create each event in Google Calendar
         for event in request.events:
             try:
-                # Parse datetime if provided, otherwise use date
-                start_datetime = None
-                end_datetime = None
+                # Convert ParsedEventResponse back to ParsedEvent
+                from ..domains.calendar.models import (
+                    ParsedEvent,
+                    EventStatus,
+                    EventVisibility,
+                    EventTransparency,
+                    Reminders,
+                )
 
-                if event.start_time and event.end_time:
-                    from datetime import datetime
+                # Parse status
+                status = EventStatus.CONFIRMED
+                if event.status == "tentative":
+                    status = EventStatus.TENTATIVE
+                elif event.status == "cancelled":
+                    status = EventStatus.CANCELLED
 
-                    start_datetime = datetime.fromisoformat(
-                        f"{event.start_date}T{event.start_time}"
-                    )
-                    end_datetime = datetime.fromisoformat(
-                        f"{event.end_date}T{event.end_time}"
-                    )
+                # Parse visibility
+                visibility = EventVisibility.DEFAULT
+                if event.visibility == "public":
+                    visibility = EventVisibility.PUBLIC
+                elif event.visibility == "private":
+                    visibility = EventVisibility.PRIVATE
 
-                created_event = user_calendar_service.create_event(
+                # Parse transparency
+                transparency = EventTransparency.OPAQUE
+                if event.transparency == "transparent":
+                    transparency = EventTransparency.TRANSPARENT
+
+                # Create ParsedEvent object
+                parsed_event = ParsedEvent(
                     title=event.title,
                     description=event.description,
-                    start_datetime=start_datetime,
-                    end_datetime=end_datetime,
-                    start_date=event.start_date if not start_datetime else None,
-                    end_date=event.end_date if not end_datetime else None,
+                    start_date=event.start_date,
+                    end_date=event.end_date,
+                    start_time=event.start_time,
+                    end_time=event.end_time,
                     attendees=event.attendees,
                     location=event.location,
+                    all_day=event.all_day,
+                    status=status,
+                    visibility=visibility,
+                    transparency=transparency,
+                    colorId=event.colorId,
+                    recurrence=event.recurrence,
+                    reminders=Reminders(useDefault=True)
+                    if not event.reminders
+                    else Reminders(useDefault=event.reminders.get("useDefault", True)),
+                    sequence=event.sequence,
+                )
+
+                created_event = user_calendar_service.create_event_from_parsed(
+                    parsed_event=parsed_event,
                     calendar_id=request.target_calendar_id,
                 )
 
@@ -222,12 +271,26 @@ async def create_events_from_timeline(
                     "html_link": event["html_link"],
                     "location": event.get("location", ""),
                     "description": event.get("description", ""),
+                    "status": event.get("status", ""),
+                    "recurrence": event.get("recurrence", []),
+                    "reminders": event.get("reminders", {}),
+                    "conferenceData": event.get("conferenceData", {}),
                     # Add parsed date/time for frontend display
-                    "start_date": event["start"].get("date") or event["start"].get("dateTime", "").split("T")[0] if event.get("start") else "",
-                    "end_date": event["end"].get("date") or event["end"].get("dateTime", "").split("T")[0] if event.get("end") else "",
-                    "start_time": event["start"].get("dateTime", "").split("T")[1][:5] if event.get("start", {}).get("dateTime") else None,
-                    "end_time": event["end"].get("dateTime", "").split("T")[1][:5] if event.get("end", {}).get("dateTime") else None,
-                    "all_day": "date" in event.get("start", {})
+                    "start_date": event["start"].get("date")
+                    or event["start"].get("dateTime", "").split("T")[0]
+                    if event.get("start")
+                    else "",
+                    "end_date": event["end"].get("date")
+                    or event["end"].get("dateTime", "").split("T")[0]
+                    if event.get("end")
+                    else "",
+                    "start_time": event["start"].get("dateTime", "").split("T")[1][:5]
+                    if event.get("start", {}).get("dateTime")
+                    else None,
+                    "end_time": event["end"].get("dateTime", "").split("T")[1][:5]
+                    if event.get("end", {}).get("dateTime")
+                    else None,
+                    "all_day": "date" in event.get("start", {}),
                 }
                 for event in created_events
             ],
