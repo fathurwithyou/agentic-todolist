@@ -1,4 +1,4 @@
-import ApiKeyManagementCard from "@/features/api-key-management/components/api-key-managemen-card";
+import ApiKeyManagementCard from "@/features/api-key-management/components/api-key-management-card";
 import LoginCard from "@/features/auth/components/login-card";
 import MyCalendarCard from "@/features/my-calendars/components/my-calendar-card";
 import TextToCalendarCard from "@/features/text-to-calendar/components/text-to-calendar-card";
