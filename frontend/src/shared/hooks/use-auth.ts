@@ -121,12 +121,14 @@ export const useAuth = () => {
 				{ token },
 				{
 					onError: (error) => {
-						onErrorVerifyToken(error, () => window.location.replace("/"));
+						onErrorVerifyToken(error, () => {
+							window.location.href = "/";
+						});
 					},
 					onSuccess: (data) => {
-						onSuccessVerifyToken(token, data, () =>
-							window.location.replace("/"),
-						);
+						onSuccessVerifyToken(token, data, () => {
+							window.location.href = "/";
+						});
 					},
 				},
 			);
