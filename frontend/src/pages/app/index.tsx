@@ -12,7 +12,11 @@ import {
 import { useAuth } from "@/shared/hooks/use-auth";
 
 export default function AppPages() {
-	const { isAuthenticated } = useAuth();
+	const { isAuthenticated, isLoading } = useAuth();
+
+	if (isLoading) {
+		return null;
+	}
 
 	if (!isAuthenticated) {
 		return <LoginCard />;
@@ -25,22 +29,13 @@ export default function AppPages() {
 
 				<Tabs defaultValue="convert" className="w-full">
 					<TabsList className="flex items-center justify-start flex-wrap h-auto space-y-1 w-full">
-						<TabsTrigger
-							value="convert"
-							className="font-manrope"
-						>
+						<TabsTrigger value="convert" className="font-manrope">
 							AI Text to Calendar
 						</TabsTrigger>
-						<TabsTrigger
-							value="calendars"
-							className="font-manrope"
-						>
+						<TabsTrigger value="calendars" className="font-manrope">
 							My Calendars
 						</TabsTrigger>
-						<TabsTrigger
-							value="apikeys"
-							className="font-manrope"
-						>
+						<TabsTrigger value="apikeys" className="font-manrope">
 							API Keys
 						</TabsTrigger>
 					</TabsList>
