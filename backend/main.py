@@ -72,7 +72,7 @@ app.include_router(
 )  # Timeline API (/api/v1/timeline/*)
 
 # Serve static frontend files
-app.mount("/", StaticFiles(directory="../frontend", html=True), name="static")
+app.mount("/", StaticFiles(directory="../frontend/dist", html=True), name="static")
 
 
 @app.get("/api")
