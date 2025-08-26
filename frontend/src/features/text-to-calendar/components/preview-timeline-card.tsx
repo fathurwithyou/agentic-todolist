@@ -60,22 +60,35 @@ export default function PreviewTimelineCard({
 							<CardDescription>{event.description}</CardDescription>
 						</CardHeader>
 						<CardContent className="text-sm">
-							<p>
-								<strong>Start:</strong>{" "}
-								{new Date(event.start_date).toLocaleDateString("en-US", {
-									year: "numeric",
-									month: "long",
-									day: "numeric",
-								})}
-							</p>
-							<p>
-								<strong>End:</strong>{" "}
-								{new Date(event.end_date).toLocaleDateString("en-US", {
-									year: "numeric",
-									month: "long",
-									day: "numeric",
-								})}
-							</p>
+							{event.start_date === event.end_date ? (
+								<p>
+									<strong>Date:</strong>{" "}
+									{new Date(event.start_date).toLocaleDateString("en-US", {
+										year: "numeric",
+										month: "long",
+										day: "numeric",
+									})}
+								</p>
+							) : (
+								<>
+									<p>
+										<strong>Start:</strong>{" "}
+										{new Date(event.start_date).toLocaleDateString("en-US", {
+											year: "numeric",
+											month: "long",
+											day: "numeric",
+										})}
+									</p>
+									<p>
+										<strong>End:</strong>{" "}
+										{new Date(event.end_date).toLocaleDateString("en-US", {
+											year: "numeric",
+											month: "long",
+											day: "numeric",
+										})}
+									</p>
+								</>
+							)}
 							{event.start_time && (
 								<p>
 									<strong>Start Time:</strong> {event.start_time}
