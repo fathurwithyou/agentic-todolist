@@ -1,5 +1,3 @@
 import type { Calendar } from "../../types";
 
-export type GetListWritableCalendars = {
-	calendars: Calendar[];
-};
+export type GetListWritableCalendars = Calendar[];
