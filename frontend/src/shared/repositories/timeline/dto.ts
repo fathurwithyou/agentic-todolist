@@ -13,6 +13,7 @@ export const PreviewTimelineSchema = z.object({
 	flexible: z.boolean(),
 	llm_provider: z.string().min(1),
 	llm_model: z.string().min(1),
+  target_calendar_id: z.string(),
 });
 
 export type PreviewTimelineRequest = z.infer<typeof PreviewTimelineSchema>;
@@ -39,6 +40,7 @@ export const CreateEventsFromTimelineSchema = z.object({
 			all_day: z.boolean(),
 		}),
 	),
+  target_calendar_id: z.string(),
 });
 
 export type CreateEventsFromTimelineRequest = z.infer<

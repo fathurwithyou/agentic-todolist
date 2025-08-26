@@ -5,13 +5,16 @@ import {
 	CardHeader,
 	CardTitle,
 } from "@/shared/components/ui/card";
-import type { CalendarEvent } from "@/shared/types";
+import type { Calendar, CalendarEvent } from "@/shared/types";
 import { useState } from "react";
 import PreviewTimelineCard from "./preview-timeline-card";
 import PreviewTimelineForm from "./preview-timeline-form";
 
 export default function TextToCalendarCard() {
 	const [createdEvents, setCreatedEvents] = useState<CalendarEvent[]>([]);
+	const [selectedTargetCalendarId, setSelectedTargetCalendarId] = useState<
+		Calendar["id"]
+	>("primary");
 
 	return (
 		<Card>
@@ -22,12 +25,21 @@ export default function TextToCalendarCard() {
 				</CardDescription>
 			</CardHeader>
 			<CardContent className="space-y-4">
-				<PreviewTimelineForm onSuccess={setCreatedEvents} />
+				<PreviewTimelineForm
+					onSuccess={(events, targetCalendarId) => {
+						setCreatedEvents(events);
+						setSelectedTargetCalendarId(targetCalendarId);
+					}}
+				/>
 
 				{createdEvents.length > 0 && (
 					<PreviewTimelineCard
 						events={createdEvents}
-						onCancel={() => setCreatedEvents([])}
+						targetCalendarId={selectedTargetCalendarId}
+						onCancel={() => {
+              setCreatedEvents([])
+              setSelectedTargetCalendarId("primary")
+            }}
 					/>
 				)}
 			</CardContent>

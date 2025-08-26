@@ -17,19 +17,25 @@ import {
 } from "@/shared/components/ui/select";
 import { Textarea } from "@/shared/components/ui/textarea";
 import { capitalize } from "@/shared/lib/string";
+import { useGetListWritableCalendarsQuery } from "@/shared/repositories/calendar/query";
 import { useGetTimelineProvidersQuery } from "@/shared/repositories/timeline/query";
 import type { CalendarEvent } from "@/shared/types";
+import type { Calendar } from "@/shared/types";
 import { LoaderCircle } from "lucide-react";
 import { usePreviewTimelineForm } from "../hooks/use-preview-timeline-form";
 
 type Props = {
-	onSuccess: (events: CalendarEvent[]) => void;
+	onSuccess: (
+		events: CalendarEvent[],
+		targetCalendarId: Calendar["id"],
+	) => void;
 };
 
 export default function PreviewTimelineForm({ onSuccess }: Props) {
 	const { data: listProvidersRes } = useGetTimelineProvidersQuery();
 	const { onSubmitHandler, isPreviewTimelinePending, llmProvider, ...form } =
 		usePreviewTimelineForm({ onSuccess });
+	const { data: listWritableCalendarsRes } = useGetListWritableCalendarsQuery();
 
 	return (
 		<Form {...form}>
@@ -96,6 +102,37 @@ export default function PreviewTimelineForm({ onSuccess }: Props) {
 						/>
 					)}
 				</div>
+				<FormField
+					control={form.control}
+					name="target_calendar_id"
+					render={({ field }) => (
+						<FormItem>
+							<FormLabel htmlFor="target_calendar_id">
+								Target Calendar
+							</FormLabel>
+							<Select
+								onValueChange={field.onChange}
+								value={field.value}
+								defaultValue={field.value}
+							>
+								<FormControl>
+									<SelectTrigger className="w-full">
+										<SelectValue placeholder="Select target calendar" />
+									</SelectTrigger>
+								</FormControl>
+								<SelectContent>
+									<SelectItem value="primary">Primary</SelectItem>
+									{listWritableCalendarsRes?.map((calendar) => (
+										<SelectItem key={calendar.id} value={calendar.id}>
+											{calendar.summary}
+										</SelectItem>
+									))}
+								</SelectContent>
+							</Select>
+							<FormMessage />
+						</FormItem>
+					)}
+				/>
 				<FormField
 					control={form.control}
 					name="timeline_text"

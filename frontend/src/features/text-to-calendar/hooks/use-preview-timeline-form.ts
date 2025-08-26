@@ -3,13 +3,16 @@ import {
 	PreviewTimelineSchema,
 } from "@/shared/repositories/timeline/dto";
 import { usePreviewTimelineMutation } from "@/shared/repositories/timeline/query";
-import type { CalendarEvent } from "@/shared/types";
+import type { Calendar, CalendarEvent } from "@/shared/types";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm, useWatch } from "react-hook-form";
 import { toast } from "sonner";
 
 type Props = {
-	onSuccess: (events: CalendarEvent[]) => void;
+	onSuccess: (
+		events: CalendarEvent[],
+		targetCalendarId: Calendar["id"],
+	) => void;
 };
 
 export const usePreviewTimelineForm = ({ onSuccess }: Props) => {
@@ -23,6 +26,7 @@ export const usePreviewTimelineForm = ({ onSuccess }: Props) => {
 			llm_provider: undefined,
 			llm_model: undefined,
 			timeline_text: "",
+			target_calendar_id: "primary",
 		},
 	});
 
@@ -38,7 +42,7 @@ export const usePreviewTimelineForm = ({ onSuccess }: Props) => {
 					`Successfully parsed ${res.total_events} events in ${res.processing_time_ms}ms using ${res.used_provider} (${res.used_model})`,
 					{ duration: 5000 },
 				);
-				onSuccess(res.parsed_events);
+				onSuccess(res.parsed_events, data.target_calendar_id);
 			},
 			onError: (err) => {
 				console.error("Preview Timeline Error:", err);

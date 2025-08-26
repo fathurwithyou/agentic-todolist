@@ -8,16 +8,21 @@ import {
 	CardTitle,
 } from "@/shared/components/ui/card";
 import { useCreateEventsFromTimelineMutation } from "@/shared/repositories/timeline/query";
-import type { CalendarEvent } from "@/shared/types";
+import type { Calendar, CalendarEvent } from "@/shared/types";
 import { LoaderCircle } from "lucide-react";
 import { toast } from "sonner";
 
 type Props = {
 	events: CalendarEvent[];
+	targetCalendarId: Calendar["id"];
 	onCancel: () => void;
 };
 
-export default function PreviewTimelineCard({ events, onCancel }: Props) {
+export default function PreviewTimelineCard({
+	events,
+	targetCalendarId,
+	onCancel,
+}: Props) {
 	const {
 		mutate: createEventsFromTimeline,
 		isPending: isCreateEventsFromTimelinePending,
@@ -27,7 +32,7 @@ export default function PreviewTimelineCard({ events, onCancel }: Props) {
 		console.log("Creating Events:", events);
 
 		createEventsFromTimeline(
-			{ events },
+			{ events, target_calendar_id: targetCalendarId },
 			{
 				onSuccess: () => {
 					toast.success(`Successfully created ${events.length} events`);
