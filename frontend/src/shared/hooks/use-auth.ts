@@ -27,7 +27,7 @@ export const useAuth = () => {
 	>({
 		isAuthenticated: false,
 		user: null,
-		isLoading: true,
+		isLoading: false,
 		token: null,
 	});
 
@@ -109,14 +109,15 @@ export const useAuth = () => {
 
 	// biome-ignore lint/correctness/useExhaustiveDependencies: <explanation>
 	useEffect(() => {
+		setState((prev) => ({
+			...prev,
+			isLoading: true,
+		}));
+
 		const searchParams = new URLSearchParams(window.location.search);
 		const token = searchParams.get("token");
 
 		if (token) {
-			setState((prev) => ({
-				...prev,
-				isLoading: true,
-			}));
 			verifyToken(
 				{ token },
 				{
@@ -137,10 +138,6 @@ export const useAuth = () => {
 
 		const storedToken = localStorage.getItem("token");
 		if (storedToken) {
-			setState((prev) => ({
-				...prev,
-				isLoading: true,
-			}));
 			verifyToken(
 				{ token: storedToken },
 				{
@@ -154,10 +151,10 @@ export const useAuth = () => {
 			);
 		}
 
-    setState((prev) => ({
-      ...prev,
-      isLoading: false,
-    }));
+		setState((prev) => ({
+			...prev,
+			isLoading: false,
+		}));
 	}, []);
 
 	return {
