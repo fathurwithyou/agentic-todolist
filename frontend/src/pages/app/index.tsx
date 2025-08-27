@@ -1,6 +1,5 @@
 import ApiKeyManagementCard from "@/features/api-key-management/components/api-key-management-card";
 import LoginCard from "@/features/auth/components/login-card";
-import MyCalendarCard from "@/features/my-calendars/components/my-calendar-card";
 import TextToCalendarCard from "@/features/text-to-calendar/components/text-to-calendar-card";
 import Header from "@/shared/components/header";
 import {
@@ -32,9 +31,6 @@ export default function AppPages() {
 						<TabsTrigger value="convert" className="font-manrope">
 							AI Text to Calendar
 						</TabsTrigger>
-						<TabsTrigger value="calendars" className="font-manrope">
-							My Calendars
-						</TabsTrigger>
 						<TabsTrigger value="apikeys" className="font-manrope">
 							API Keys
 						</TabsTrigger>
@@ -42,10 +38,6 @@ export default function AppPages() {
 
 					<TabsContent value="convert" className="space-y-4">
 						<TextToCalendarCard />
-					</TabsContent>
-
-					<TabsContent value="calendars" className="space-y-4">
-						<MyCalendarCard />
 					</TabsContent>
 
 					<TabsContent value="apikeys" className="space-y-4">
