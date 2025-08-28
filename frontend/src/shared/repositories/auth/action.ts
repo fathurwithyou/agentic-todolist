@@ -1,6 +1,6 @@
 import { apiFetcher, jsonFetcher } from "../../lib/fetcher";
 import type { VerifyTokenParams, VerifyTokenResponse } from "./dto";
-import type { GetProfileResponse } from "./dto";
+import type { GetProfileResponse, SaveSystemPromptParams, SaveSystemPromptResponse } from "./dto";
 
 export const verifyToken = async (params: VerifyTokenParams) => {
 	const response = await jsonFetcher<VerifyTokenResponse>(
@@ -28,6 +28,18 @@ export const logout = async () => {
 	const response = await apiFetcher("/api/v1/auth/logout", {
 		method: "POST",
 	});
+
+	return response;
+};
+
+export const saveSystemPrompt = async (params: SaveSystemPromptParams) => {
+	const response = await jsonFetcher<SaveSystemPromptResponse>(
+		"/api/v1/auth/system-prompt",
+		{
+			method: "POST",
+			body: JSON.stringify(params),
+		},
+	);
 
 	return response;
 };

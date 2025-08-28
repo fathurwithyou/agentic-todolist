@@ -27,7 +27,7 @@ class LLMProvider(ABC):
         pass
 
     @abstractmethod
-    async def parse_timeline(self, timeline_text: str) -> List[ParsedEvent]:
+    async def parse_timeline(self, timeline_text: str, system_prompt: Optional[str] = None) -> List[ParsedEvent]:
         """Parse timeline text into structured events."""
         pass
 
@@ -36,12 +36,20 @@ class LLMProvider(ABC):
         """Check if the provider is properly configured."""
         pass
 
-    def _create_parsing_prompt(self, timeline_text: str) -> str:
+    def _create_parsing_prompt(self, timeline_text: str, system_prompt: Optional[str] = None) -> str:
         """Create a structured prompt for timeline parsing."""
+        context_section = ""
+        if system_prompt:
+            context_section = f"""
+CONTEXT & KNOWLEDGE:
+{system_prompt}
+
+"""
+        
         return f"""
 You are an expert timeline parser. Parse the following timeline text and extract structured event information.
 
-TIMELINE TEXT:
+{context_section}TIMELINE TEXT:
 {timeline_text}
 
 INSTRUCTIONS:

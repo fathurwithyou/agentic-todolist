@@ -7,7 +7,7 @@ import os
 import logging
 from typing import Optional
 from datetime import datetime, timedelta
-from fastapi import APIRouter, Request, HTTPException, Depends
+from fastapi import APIRouter, Request, HTTPException, Depends, Body
 from fastapi.responses import RedirectResponse
 from pydantic import BaseModel
 
@@ -184,3 +184,35 @@ async def get_calendar_status(current_user: User = Depends(get_current_user)):
         if not has_calendar_access or token_expired
         else "Calendar access available",
     }
+
+
+class SystemPromptRequest(BaseModel):
+    """Request to save system prompt"""
+    system_prompt: str
+
+
+class SystemPromptResponse(BaseModel):
+    """System prompt response"""
+    system_prompt: Optional[str] = None
+
+
+@router.post("/system-prompt")
+async def save_system_prompt(
+    request: SystemPromptRequest, current_user=Depends(get_current_user)
+):
+    """Save user's system prompt for timeline parsing"""
+    try:
+        user = current_user.user
+        user.system_prompt = request.system_prompt
+        auth_repository.save_user(user)
+        
+        return {"success": True, "message": "System prompt saved successfully"}
+    except Exception as e:
+        logger.error(f"Failed to save system prompt: {e}")
+        raise HTTPException(status_code=500, detail="Failed to save system prompt")
+
+
+@router.get("/system-prompt", response_model=SystemPromptResponse)
+async def get_system_prompt(current_user=Depends(get_current_user)):
+    """Get user's saved system prompt"""
+    return SystemPromptResponse(system_prompt=current_user.user.system_prompt)

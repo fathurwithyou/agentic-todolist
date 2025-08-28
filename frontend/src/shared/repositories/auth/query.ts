@@ -1,6 +1,7 @@
 import { useMutation, useQuery } from "@tanstack/react-query";
-import { getProfile, logout, verifyToken } from "./action";
-import type { VerifyTokenParams } from "./dto";
+import { getProfile, logout, verifyToken, saveSystemPrompt } from "./action";
+import { jsonFetcher } from "../../lib/fetcher";
+import type { VerifyTokenParams, SaveSystemPromptParams, GetSystemPromptResponse } from "./dto";
 
 export const useLoginWithGoogleMutation = () => {
 	return useMutation({
@@ -26,5 +27,20 @@ export const useGetProfileQuery = () => {
 export const useLogoutMutation = () => {
 	return useMutation({
 		mutationFn: logout,
+	});
+};
+
+export const useSaveSystemPromptMutation = () => {
+	return useMutation({
+		mutationFn: (params: SaveSystemPromptParams) => saveSystemPrompt(params),
+	});
+};
+
+export const useGetSystemPromptQuery = () => {
+	return useQuery({
+		queryKey: ["system-prompt"],
+		queryFn: () => jsonFetcher<GetSystemPromptResponse>("/api/v1/auth/system-prompt", {
+			method: "GET",
+		}),
 	});
 };

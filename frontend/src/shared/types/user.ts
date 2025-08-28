@@ -3,4 +3,5 @@ export type User = {
 	email: string;
 	name: string;
 	picture: string;
+	system_prompt?: string;
 };

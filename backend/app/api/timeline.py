@@ -127,6 +127,8 @@ async def preview_timeline(
 
         # Parse timeline using domain service
         result = await calendar_service.parse_timeline(parse_request)
+        
+        logger.info("result: " + str(result))
 
         # Convert to response format
         parsed_events = [

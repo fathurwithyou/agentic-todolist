@@ -1,6 +1,7 @@
 import ApiKeyManagementCard from "@/features/api-key-management/components/api-key-management-card";
 import LoginCard from "@/features/auth/components/login-card";
 import TextToCalendarCard from "@/features/text-to-calendar/components/text-to-calendar-card";
+import { SystemPromptManagementCard } from "@/features/system-prompt/components/system-prompt-management-card";
 import Header from "@/shared/components/header";
 import {
 	Tabs,
@@ -34,6 +35,9 @@ export default function AppPages() {
 						<TabsTrigger value="apikeys" className="font-manrope">
 							API Keys
 						</TabsTrigger>
+						<TabsTrigger value="settings" className="font-manrope">
+							Settings
+						</TabsTrigger>
 					</TabsList>
 
 					<TabsContent value="convert" className="space-y-4">
@@ -42,6 +46,10 @@ export default function AppPages() {
 
 					<TabsContent value="apikeys" className="space-y-4">
 						<ApiKeyManagementCard />
+					</TabsContent>
+
+					<TabsContent value="settings" className="space-y-4">
+						<SystemPromptManagementCard />
 					</TabsContent>
 				</Tabs>
 			</div>
