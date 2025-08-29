@@ -3,17 +3,18 @@ import { Button } from "@/shared/components/ui/button";
 import { Card } from "@/shared/components/ui/card";
 import { useAuth } from "@/shared/hooks/use-auth";
 import { cn } from "@/shared/lib/utils";
-import {
-  ArrowRight,
-  Calendar,
-  Check,
-  //   ChevronRight,
+import { 
+  ArrowRight, 
+  Calendar, 
+  Check, 
+  ChevronRight,
   Clock,
   Globe,
   Sparkles,
   Users,
   Shield,
-  Bot,
+  FileText,
+  Bot
 } from "lucide-react";
 import React, { useEffect, useState } from "react";
 
@@ -29,7 +30,7 @@ export default function LandingPage() {
           }
         });
       },
-      { threshold: 0.1 }
+      { threshold: 0.1 },
     );
 
     const elements = document.querySelectorAll(".fade-in-on-scroll");
@@ -43,9 +44,7 @@ export default function LandingPage() {
       <Navbar loginAction={loginWithGoogle} />
       <main>
         <HeroSection loginAction={loginWithGoogle} />
-        <hr className="border-t" />
         <FeaturesSection />
-        <hr className="border-t" />
         <TestimonialsSection />
       </main>
       <Footer />
@@ -66,19 +65,21 @@ const Navbar = ({ loginAction }: { loginAction: () => void }) => {
   }, []);
 
   return (
-    <header className={cn("fixed top-0 left-0 right-0 z-50 transition-all duration-300", isScrolled ? "py-2" : "py-4")}>
-      <nav
-        className={cn(
-          "mx-auto transition-all duration-300",
-          isScrolled
-            ? "glass max-w-4xl px-6 rounded-2xl shadow-soft border"
-            : "container-width"
-        )}>
+    <header className={cn(
+      "fixed top-0 left-0 right-0 z-50 transition-all duration-300",
+      isScrolled ? "py-2" : "py-4"
+    )}>
+      <nav className={cn(
+        "mx-auto transition-all duration-300",
+        isScrolled 
+          ? "max-w-4xl px-6 bg-background/95 backdrop-blur-xl border border-border rounded-2xl shadow-soft" 
+          : "container-width"
+      )}>
         <div className="flex h-14 items-center justify-between">
           <div className="flex items-center gap-2">
             <span className="font-semibold text-lg">CalendarAI</span>
           </div>
-
+          
           <div className="hidden md:flex items-center gap-8">
             <a href="#features" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
               Features
@@ -103,6 +104,245 @@ const Navbar = ({ loginAction }: { loginAction: () => void }) => {
   );
 };
 
+// Text to Calendar Demo Illustration
+const TextToCalendarDemo = () => {
+  const [activeStep, setActiveStep] = useState(0);
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setActiveStep((prev) => (prev + 1) % 3);
+    }, 3000);
+    return () => clearInterval(interval);
+  }, []);
+
+  return (
+    <div className="relative">
+      {/* Connection Line */}
+      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-lg hidden lg:block">
+        <div className="relative h-[2px] bg-gradient-to-r from-transparent via-primary/20 to-transparent">
+          <div 
+            className="absolute top-0 h-full bg-gradient-to-r from-transparent via-primary to-transparent transition-all duration-1000"
+            style={{
+              width: activeStep === 1 ? '100%' : '0%',
+              left: '0',
+            }}
+          />
+        </div>
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2">
+          <div className={cn(
+            "px-3 py-1.5 bg-primary text-primary-foreground text-xs rounded-full transition-all duration-300",
+            activeStep === 1 ? "opacity-100 scale-100" : "opacity-0 scale-90"
+          )}>
+            <Sparkles className="w-3 h-3 inline mr-1" />
+            AI Processing
+          </div>
+        </div>
+      </div>
+
+      <div className="grid lg:grid-cols-2 gap-8 lg:gap-32">
+        {/* Text Input Side */}
+        <div className={cn(
+          "transition-all duration-500",
+          activeStep === 0 ? "scale-105 opacity-100" : "scale-100 opacity-70"
+        )}>
+          <div className="mb-4">
+            <div className="inline-flex items-center gap-2 px-3 py-1 bg-blue-100 dark:bg-blue-900/20 text-blue-700 dark:text-blue-400 rounded-full text-xs font-medium">
+              <FileText className="w-3 h-3" />
+              Input Text
+            </div>
+          </div>
+          <Card className="overflow-hidden border-2 border-border/50 shadow-xl">
+            <div className="bg-muted/30 px-4 py-3 border-b flex items-center gap-2">
+              <div className="flex gap-1.5">
+                <div className="w-3 h-3 rounded-full bg-red-500" />
+                <div className="w-3 h-3 rounded-full bg-yellow-500" />
+                <div className="w-3 h-3 rounded-full bg-green-500" />
+              </div>
+              <span className="text-xs text-muted-foreground ml-2">timeline.txt</span>
+            </div>
+            <div className="p-6 font-mono text-sm space-y-3">
+              <p className={cn(
+                "transition-all duration-500",
+                activeStep >= 1 ? "text-primary" : "text-muted-foreground"
+              )}>
+                <span className="text-blue-600">Project Timeline:</span>
+              </p>
+              <p className="text-muted-foreground">
+                July 1-10: Submit proposal<br/>
+                August 11 - Sept 2: Review period<br/>
+                <span className={cn(
+                  "inline-block transition-all duration-500",
+                  activeStep >= 1 ? "bg-yellow-200 dark:bg-yellow-900/30 px-1 rounded" : ""
+                )}>
+                  Sept 8 at 10:00 AM: Finalist announcement
+                </span><br/>
+                Oct 27 9:00-17:00: Final presentation Day 1<br/>
+                Oct 28 13:30-15:30: Final presentation
+              </p>
+              <p className="text-muted-foreground pt-2">
+                <span className="text-purple-600">Meetings:</span><br/>
+                July 15 at 2:00 PM: Coordination meeting<br/>
+                <span className={cn(
+                  "inline-block transition-all duration-500",
+                  activeStep >= 1 ? "bg-green-200 dark:bg-green-900/30 px-1 rounded" : ""
+                )}>
+                  July 20 10:30-12:00: Progress review
+                </span>
+              </p>
+              <p className="text-muted-foreground pt-2">
+                <span className="text-orange-600">Attendees:</span> 
+                <span className={cn(
+                  "inline-block transition-all duration-500 ml-1",
+                  activeStep >= 1 ? "text-blue-600 underline" : ""
+                )}>
+                  fathur@example.com, team@company.com
+                </span>
+              </p>
+            </div>
+          </Card>
+        </div>
+
+        {/* Calendar Output Side */}
+        <div className={cn(
+          "transition-all duration-500",
+          activeStep === 2 ? "scale-105 opacity-100" : "scale-100 opacity-70"
+        )}>
+          <div className="mb-4">
+            <div className="inline-flex items-center gap-2 px-3 py-1 bg-green-100 dark:bg-green-900/20 text-green-700 dark:text-green-400 rounded-full text-xs font-medium">
+              <Calendar className="w-3 h-3" />
+              Calendar Events
+            </div>
+          </div>
+          <Card className="overflow-hidden border-2 border-border/50 shadow-xl">
+            <div className="bg-muted/30 px-4 py-3 border-b flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <Calendar className="w-4 h-4 text-muted-foreground" />
+                <span className="text-sm font-medium">Google Calendar</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <span className="text-xs text-muted-foreground">July 2024</span>
+                <ChevronRight className="w-3 h-3 text-muted-foreground" />
+              </div>
+            </div>
+            <div className="p-6 space-y-3">
+              {/* Calendar Grid Header */}
+              <div className="grid grid-cols-7 gap-1 text-xs text-muted-foreground mb-2">
+                {['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map(day => (
+                  <div key={day} className="text-center py-1">{day}</div>
+                ))}
+              </div>
+              
+              {/* Calendar Events */}
+              <div className="space-y-2">
+                <CalendarEvent 
+                  date="July 1-10"
+                  title="Submit proposal"
+                  color="bg-blue-500"
+                  show={activeStep === 2}
+                  delay={0}
+                />
+                <CalendarEvent 
+                  date="July 15, 2:00 PM"
+                  title="Coordination meeting"
+                  color="bg-purple-500"
+                  show={activeStep === 2}
+                  delay={100}
+                />
+                <CalendarEvent 
+                  date="July 20, 10:30 AM"
+                  title="Progress review"
+                  color="bg-green-500"
+                  show={activeStep === 2}
+                  delay={200}
+                />
+                <CalendarEvent 
+                  date="Sept 8, 10:00 AM"
+                  title="Finalist announcement"
+                  color="bg-yellow-500"
+                  show={activeStep === 2}
+                  delay={300}
+                />
+                <CalendarEvent 
+                  date="Oct 27, 9:00 AM"
+                  title="Final presentation Day 1"
+                  color="bg-red-500"
+                  show={activeStep === 2}
+                  delay={400}
+                />
+              </div>
+
+              {/* Success Message */}
+              <div className={cn(
+                "mt-4 p-3 bg-green-100 dark:bg-green-900/20 rounded-lg transition-all duration-300",
+                activeStep === 2 ? "opacity-100 translate-y-0" : "opacity-0 translate-y-2"
+              )}>
+                <div className="flex items-center gap-2 text-green-700 dark:text-green-400">
+                  <Check className="w-4 h-4" />
+                  <span className="text-sm font-medium">5 events created successfully!</span>
+                </div>
+              </div>
+            </div>
+          </Card>
+        </div>
+      </div>
+
+      {/* Progress Indicators */}
+      <div className="flex justify-center gap-2 mt-8">
+        {[0, 1, 2].map((step) => (
+          <button
+            key={step}
+            onClick={() => setActiveStep(step)}
+            className={cn(
+              "w-2 h-2 rounded-full transition-all duration-300",
+              activeStep === step 
+                ? "w-8 bg-primary" 
+                : "bg-primary/20 hover:bg-primary/30"
+            )}
+          />
+        ))}
+      </div>
+    </div>
+  );
+};
+
+// Calendar Event Component
+const CalendarEvent = ({ 
+  date, 
+  title, 
+  color, 
+  show, 
+  delay 
+}: { 
+  date: string; 
+  title: string; 
+  color: string; 
+  show: boolean; 
+  delay: number;
+}) => (
+  <div 
+    className={cn(
+      "flex items-center gap-3 p-3 rounded-lg border border-border/50 bg-background transition-all duration-500",
+      show ? "opacity-100 translate-x-0" : "opacity-0 -translate-x-4"
+    )}
+    style={{ transitionDelay: `${delay}ms` }}
+  >
+    <div className={cn("w-1 h-12 rounded-full", color)} />
+    <div className="flex-1">
+      <p className="font-medium text-sm">{title}</p>
+      <p className="text-xs text-muted-foreground flex items-center gap-1 mt-1">
+        <Clock className="w-3 h-3" />
+        {date}
+      </p>
+    </div>
+    <div className="flex items-center gap-1">
+      <div className="w-6 h-6 rounded-full bg-muted flex items-center justify-center">
+        <Users className="w-3 h-3 text-muted-foreground" />
+      </div>
+      <span className="text-xs text-muted-foreground">2</span>
+    </div>
+  </div>
+);
+
 // Hero Section
 const HeroSection = ({ loginAction }: { loginAction: () => void }) => (
   <section className="relative pt-32 pb-20 md:pt-40 md:pb-28 overflow-hidden">
@@ -111,26 +351,25 @@ const HeroSection = ({ loginAction }: { loginAction: () => void }) => (
       <div className="absolute top-20 left-10 w-72 h-72 bg-primary/5 rounded-full blur-3xl" />
       <div className="absolute bottom-0 right-10 w-96 h-96 bg-primary/3 rounded-full blur-3xl" />
     </div>
-
+    
     <div className="container-width">
       <div className="max-w-5xl mx-auto text-center space-y-8">
         <div className="inline-flex items-center gap-2 px-4 py-2 bg-primary/5 border border-primary/10 rounded-full text-sm animate-in">
           <Sparkles className="w-4 h-4 text-primary" />
           <span>AI-Powered Calendar Management</span>
         </div>
-
+        
         <h1 className="text-5xl md:text-7xl font-bold tracking-tighter animate-in" style={{ animationDelay: "100ms" }}>
           Transform text into
           <span className="block text-transparent bg-clip-text bg-gradient-to-r from-primary via-primary/80 to-primary/60">
             perfectly organized events
           </span>
         </h1>
-
+        
         <p className="text-xl text-muted-foreground max-w-2xl mx-auto animate-in" style={{ animationDelay: "200ms" }}>
-          Stop manually creating calendar events. Just paste your text and let AI handle the rest—dates, times, attendees, all
-          automated.
+          Stop manually creating calendar events. Just paste your text and let AI handle the rest—dates, times, attendees, all automated.
         </p>
-
+        
         <div className="flex flex-col sm:flex-row gap-4 justify-center pt-4 animate-in" style={{ animationDelay: "300ms" }}>
           <Button onClick={loginAction} size="lg" className="h-14 px-8 text-base shadow-lg hover:shadow-xl">
             Start Free with Google
@@ -140,10 +379,8 @@ const HeroSection = ({ loginAction }: { loginAction: () => void }) => (
             Watch Demo
           </Button>
         </div>
-
-        <div
-          className="flex items-center justify-center gap-8 pt-8 text-sm text-muted-foreground animate-in"
-          style={{ animationDelay: "400ms" }}>
+        
+        <div className="flex items-center justify-center gap-8 pt-8 text-sm text-muted-foreground animate-in" style={{ animationDelay: "400ms" }}>
           <div className="flex items-center gap-2">
             <Check className="w-4 h-4 text-green-600" />
             <span>No credit card required</span>
@@ -158,20 +395,13 @@ const HeroSection = ({ loginAction }: { loginAction: () => void }) => (
           </div>
         </div>
       </div>
-
+      
       {/* Hero Image/Demo */}
       <div className="mt-16 relative">
         <div className="absolute inset-0 bg-gradient-to-t from-background via-transparent to-transparent z-10 pointer-events-none" />
-        <Card className="mx-auto max-w-4xl overflow-hidden border-border/50 shadow-2xl fade-in-on-scroll">
-          <div className="aspect-[16/9] bg-gradient-to-br from-muted/50 to-muted/30 flex items-center justify-center">
-            <div className="text-center space-y-4 p-12">
-              <div className="w-20 h-20 mx-auto bg-primary/10 rounded-2xl flex items-center justify-center">
-                <Calendar className="w-10 h-10 text-primary" />
-              </div>
-              <p className="text-muted-foreground">Interactive Demo Coming Soon</p>
-            </div>
-          </div>
-        </Card>
+        <div className="mx-auto max-w-5xl fade-in-on-scroll">
+          <TextToCalendarDemo />
+        </div>
       </div>
     </div>
   </section>
@@ -182,12 +412,14 @@ const FeaturesSection = () => (
   <section id="features" className="py-24">
     <div className="container-width">
       <div className="text-center max-w-3xl mx-auto mb-16 space-y-4">
-        <h2 className="text-4xl font-bold tracking-tight fade-in-on-scroll">Everything you need to automate your calendar</h2>
+        <h2 className="text-4xl font-bold tracking-tight fade-in-on-scroll">
+          Everything you need to automate your calendar
+        </h2>
         <p className="text-lg text-muted-foreground fade-in-on-scroll">
           Powerful features that save hours of manual scheduling work
         </p>
       </div>
-
+      
       <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
         <FeatureCard
           icon={<Bot className="w-6 h-6" />}
@@ -230,26 +462,26 @@ const FeaturesSection = () => (
   </section>
 );
 
-const FeatureCard = ({
-  icon,
-  title,
-  description,
-  gradient,
-}: {
+const FeatureCard = ({ 
+  icon, 
+  title, 
+  description, 
+  gradient 
+}: { 
   icon: React.ReactNode;
   title: string;
   description: string;
   gradient: string;
 }) => (
   <Card className="group relative overflow-hidden border-border/50 hover:border-border hover:shadow-soft-lg transition-all duration-300 fade-in-on-scroll">
-    <div
-      className={cn(
-        "absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300 bg-gradient-to-br",
-        gradient
-      )}
-    />
+    <div className={cn(
+      "absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300 bg-gradient-to-br",
+      gradient
+    )} />
     <div className="relative p-6 space-y-4">
-      <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center text-primary">{icon}</div>
+      <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center text-primary">
+        {icon}
+      </div>
       <h3 className="font-semibold text-lg">{title}</h3>
       <p className="text-muted-foreground text-sm leading-relaxed">{description}</p>
     </div>
@@ -261,10 +493,14 @@ const TestimonialsSection = () => (
   <section id="testimonials" className="py-24">
     <div className="container-width">
       <div className="text-center max-w-3xl mx-auto mb-16 space-y-4">
-        <h2 className="text-4xl font-bold tracking-tight fade-in-on-scroll">Loved by busy professionals</h2>
-        <p className="text-lg text-muted-foreground fade-in-on-scroll">Join thousands who've simplified their scheduling</p>
+        <h2 className="text-4xl font-bold tracking-tight fade-in-on-scroll">
+          Loved by busy professionals
+        </h2>
+        <p className="text-lg text-muted-foreground fade-in-on-scroll">
+          Join thousands who've simplified their scheduling
+        </p>
       </div>
-
+      
       <div className="grid md:grid-cols-3 gap-6">
         <TestimonialCard
           quote="This tool saved me hours every week. I just forward emails to myself with event details and CalendarAI does the rest."
@@ -289,7 +525,17 @@ const TestimonialsSection = () => (
   </section>
 );
 
-const TestimonialCard = ({ quote, author, role, avatar }: { quote: string; author: string; role: string; avatar: string }) => (
+const TestimonialCard = ({ 
+  quote, 
+  author, 
+  role, 
+  avatar 
+}: { 
+  quote: string;
+  author: string;
+  role: string;
+  avatar: string;
+}) => (
   <Card className="p-6 border-border/50 fade-in-on-scroll">
     <div className="space-y-4">
       <div className="flex gap-1">
@@ -322,75 +568,43 @@ const Footer = () => (
           <div className="flex items-center gap-2 mb-4">
             <span className="font-semibold text-lg">CalendarAI</span>
           </div>
-          <p className="text-sm text-muted-foreground">Transform text into calendar events with AI</p>
+          <p className="text-sm text-muted-foreground">
+            Transform text into calendar events with AI
+          </p>
         </div>
-
+        
         <div>
           <h4 className="font-medium mb-4">Product</h4>
           <ul className="space-y-2 text-sm text-muted-foreground">
-            <li>
-              <a href="#" className="hover:text-foreground transition-colors">
-                Features
-              </a>
-            </li>
-            <li>
-              <a href="#" className="hover:text-foreground transition-colors">
-                Pricing
-              </a>
-            </li>
-            <li>
-              <a href="#" className="hover:text-foreground transition-colors">
-                API
-              </a>
-            </li>
+            <li><a href="#" className="hover:text-foreground transition-colors">Features</a></li>
+            <li><a href="#" className="hover:text-foreground transition-colors">Pricing</a></li>
+            <li><a href="#" className="hover:text-foreground transition-colors">API</a></li>
           </ul>
         </div>
-
+        
         <div>
           <h4 className="font-medium mb-4">Company</h4>
           <ul className="space-y-2 text-sm text-muted-foreground">
-            <li>
-              <a href="#" className="hover:text-foreground transition-colors">
-                About
-              </a>
-            </li>
-            <li>
-              <a href="#" className="hover:text-foreground transition-colors">
-                Blog
-              </a>
-            </li>
-            <li>
-              <a href="#" className="hover:text-foreground transition-colors">
-                Careers
-              </a>
-            </li>
+            <li><a href="#" className="hover:text-foreground transition-colors">About</a></li>
+            <li><a href="#" className="hover:text-foreground transition-colors">Blog</a></li>
+            <li><a href="#" className="hover:text-foreground transition-colors">Careers</a></li>
           </ul>
         </div>
-
+        
         <div>
           <h4 className="font-medium mb-4">Legal</h4>
           <ul className="space-y-2 text-sm text-muted-foreground">
-            <li>
-              <a href="#" className="hover:text-foreground transition-colors">
-                Privacy
-              </a>
-            </li>
-            <li>
-              <a href="#" className="hover:text-foreground transition-colors">
-                Terms
-              </a>
-            </li>
-            <li>
-              <a href="#" className="hover:text-foreground transition-colors">
-                Security
-              </a>
-            </li>
+            <li><a href="#" className="hover:text-foreground transition-colors">Privacy</a></li>
+            <li><a href="#" className="hover:text-foreground transition-colors">Terms</a></li>
+            <li><a href="#" className="hover:text-foreground transition-colors">Security</a></li>
           </ul>
         </div>
       </div>
-
+      
       <div className="pt-8 border-t flex flex-col md:flex-row justify-between items-center gap-4">
-        <p className="text-sm text-muted-foreground">© {new Date().getFullYear()} CalendarAI. All rights reserved.</p>
+        <p className="text-sm text-muted-foreground">
+          © {new Date().getFullYear()} CalendarAI. All rights reserved.
+        </p>
         <div className="flex gap-6">
           <a href="#" className="text-muted-foreground hover:text-foreground transition-colors">
             <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
