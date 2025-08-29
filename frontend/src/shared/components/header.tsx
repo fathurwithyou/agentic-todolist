@@ -1,5 +1,5 @@
 import { Button } from "@/shared/components/ui/button";
-import { Calendar, LogOut, Menu } from "lucide-react";
+import { LogOut, Menu } from "lucide-react";
 import { useAuth } from "../hooks/use-auth";
 import { useIsMobile } from "../hooks/use-mobile";
 import { getInitials } from "../lib/string";
@@ -26,9 +26,6 @@ export default function Header() {
 			<div className="container-width">
 				<div className="flex h-16 items-center justify-between">
 					<div className="flex items-center space-x-3">
-						<div className="w-10 h-10 bg-primary rounded-xl flex items-center justify-center shadow-sm">
-							<Calendar className="w-5 h-5 text-primary-foreground" />
-						</div>
 						<div>
 							<h1 className="text-lg font-semibold">CalendarAI</h1>
 							<p className="text-xs text-muted-foreground hidden sm:block">

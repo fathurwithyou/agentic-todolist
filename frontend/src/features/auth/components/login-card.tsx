@@ -17,9 +17,6 @@ export default function LoginCard() {
 			<div className="w-full max-w-md animate-in">
 				<Card className="border-0 shadow-xl">
 					<CardHeader className="text-center space-y-6 pt-10 pb-8">
-						<div className="mx-auto w-16 h-16 bg-primary rounded-2xl flex items-center justify-center shadow-lg">
-							<Calendar className="w-8 h-8 text-primary-foreground" />
-						</div>
 						<div className="space-y-2">
 							<CardTitle className="text-3xl font-bold tracking-tight">
 								Welcome to CalendarAI

@@ -43,9 +43,9 @@ export default function LandingPage() {
       <Navbar loginAction={loginWithGoogle} />
       <main>
         <HeroSection loginAction={loginWithGoogle} />
-        <hr className="border-dashed border-1 border-muted" /> <LogoCloud />
+        <hr className="border-t" /> <LogoCloud />
         <FeaturesSection />
-        <hr className="border-dashed border-1 border-muted" />
+        <hr className="border-t" />
         <TestimonialsSection />
       </main>
       <Footer />
@@ -76,9 +76,6 @@ const Navbar = ({ loginAction }: { loginAction: () => void }) => {
         )}>
         <div className="flex h-14 items-center justify-between">
           <div className="flex items-center gap-2">
-            <div className="w-9 h-9 bg-primary rounded-xl flex items-center justify-center">
-              <Calendar className="w-5 h-5 text-primary-foreground" />
-            </div>
             <span className="font-semibold text-lg">CalendarAI</span>
           </div>
 
@@ -342,9 +339,6 @@ const Footer = () => (
       <div className="grid grid-cols-2 md:grid-cols-4 gap-8 mb-12">
         <div className="col-span-2 md:col-span-1">
           <div className="flex items-center gap-2 mb-4">
-            <div className="w-9 h-9 bg-primary rounded-xl flex items-center justify-center">
-              <Calendar className="w-5 h-5 text-primary-foreground" />
-            </div>
             <span className="font-semibold text-lg">CalendarAI</span>
           </div>
           <p className="text-sm text-muted-foreground">Transform text into calendar events with AI</p>
