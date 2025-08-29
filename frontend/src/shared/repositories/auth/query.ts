@@ -6,7 +6,10 @@ import type { VerifyTokenParams, SaveSystemPromptParams, GetSystemPromptResponse
 export const useLoginWithGoogleMutation = () => {
 	return useMutation({
 		mutationFn: async () => {
-			return window.location.assign("/api/v1/auth/google");
+			const API_HOST = import.meta.env.VITE_API_HOST;
+			const API_PORT = import.meta.env.VITE_API_PORT;
+			const googleLoginUrl = `${API_HOST}:${API_PORT}/api/v1/auth/google`;
+			return window.location.assign(googleLoginUrl);
 		},
 	});
 };

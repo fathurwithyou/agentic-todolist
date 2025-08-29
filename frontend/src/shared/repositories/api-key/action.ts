@@ -25,10 +25,8 @@ export const getListApiKeys = async () => {
 export const saveApiKey = async (req: SaveApiKeyRequest) => {
 	const response = await jsonFetcher("/api/v1/api-keys/save", {
 		method: "POST",
-		headers: {
-			"Content-Type": "application/json",
-		},
-		body: JSON.stringify(req),
+
+		data: req,
 	});
 	return response;
 };
@@ -38,9 +36,6 @@ export const removeApiKey = async (params: RemoveApiKeyParams) => {
 		`/api/v1/api-keys/remove/${params.provider}`,
 		{
 			method: "DELETE",
-			headers: {
-				"Content-Type": "application/json",
-			},
 		},
 	);
 	return response;
@@ -51,9 +46,7 @@ export const testApiKey = async (params: TestApiKeyParams) => {
 		`/api/v1/api-keys/test/${params.provider}`,
 		{
 			method: "GET",
-			headers: {
-				"Content-Type": "application/json",
-			},
+
 		},
 	);
 	return response;

@@ -24,6 +24,8 @@ import type { CalendarEvent } from "@/shared/types";
 import type { Calendar } from "@/shared/types";
 import { Sparkles, CalendarDays, Loader2 } from "lucide-react";
 import { usePreviewTimelineForm } from "../hooks/use-preview-timeline-form";
+import { useGetModelsQuery } from "@/shared/repositories/llm/query";
+import { useGetListApiKeysQuery } from "@/shared/repositories/api-key/query";
 
 type Props = {
 	onSuccess: (
@@ -37,6 +39,14 @@ export default function PreviewTimelineForm({ onSuccess }: Props) {
 	const { onSubmitHandler, isPreviewTimelinePending, llmProvider, ...form } =
 		usePreviewTimelineForm({ onSuccess });
 	const { data: listWritableCalendarsRes } = useGetListWritableCalendarsQuery();
+	const { data: apiKeys } = useGetListApiKeysQuery();
+
+	const hasApiKey = llmProvider ? apiKeys?.api_keys[llmProvider] : false;
+
+	const { data: models, isLoading: isLoadingModels } = useGetModelsQuery(
+		llmProvider,
+		hasApiKey,
+	);
 
 	return (
 		<Form {...form}>
@@ -81,20 +91,20 @@ export default function PreviewTimelineForm({ onSuccess }: Props) {
 										onValueChange={field.onChange}
 										value={field.value}
 										defaultValue={field.value}
+										disabled={!hasApiKey || isLoadingModels}
 									>
 										<FormControl>
 											<SelectTrigger className="transition-all duration-150">
-												<SelectValue placeholder="Select a model" />
+												<SelectValue placeholder={!hasApiKey ? "API key required" : "Select a model"} />
 											</SelectTrigger>
 										</FormControl>
 										<SelectContent>
-											{listProvidersRes?.provider_models[llmProvider].map(
-												(model) => (
-													<SelectItem key={model} value={model}>
-														{model}
-													</SelectItem>
-												),
-											)}
+											{isLoadingModels && <SelectItem value="loading" disabled>Loading...</SelectItem>}
+											{models?.map((model) => (
+												<SelectItem key={model} value={model}>
+													{model}
+												</SelectItem>
+											))}
 										</SelectContent>
 									</Select>
 									<FormMessage />

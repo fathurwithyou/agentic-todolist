@@ -37,7 +37,7 @@ export const saveSystemPrompt = async (params: SaveSystemPromptParams) => {
 		"/api/v1/auth/system-prompt",
 		{
 			method: "POST",
-			body: JSON.stringify(params),
+			data: params,
 		},
 	);
 

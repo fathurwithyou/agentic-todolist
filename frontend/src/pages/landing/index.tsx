@@ -90,7 +90,7 @@ const Navbar = ({ loginAction }: { loginAction: () => void }) => {
           </div>
 
           <div className="flex items-center gap-4">
-            <Button variant="ghost" className="hidden md:inline-flex">
+            <Button variant="ghost" className="hidden md:inline-flex"  onClick={() => window.location.href = '/login'}>
               Sign In
             </Button>
             <Button onClick={loginAction} className="shadow-sm">
