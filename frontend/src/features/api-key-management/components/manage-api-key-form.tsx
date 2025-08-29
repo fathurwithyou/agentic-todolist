@@ -18,7 +18,7 @@ import {
 } from "@/shared/components/ui/select";
 import { capitalize } from "@/shared/lib/string";
 import { useGetListProvidersQuery } from "@/shared/repositories/api-key/query";
-import { LoaderCircle } from "lucide-react";
+import { Loader2, TestTube, Save, Key } from "lucide-react";
 import { useManageAPIKeyForm } from "../hooks/use-manage-api-key-form";
 
 export default function ManageApiKeyForm() {
@@ -35,20 +35,23 @@ export default function ManageApiKeyForm() {
 
 	return (
 		<Form {...form}>
-			<form onSubmit={onSubmitHandler} className="space-y-4">
+			<form onSubmit={onSubmitHandler} className="space-y-6">
 				<FormField
 					control={form.control}
 					name="provider"
 					render={({ field }) => (
 						<FormItem>
-							<FormLabel htmlFor="provider">Available Providers</FormLabel>
+							<FormLabel className="flex items-center gap-2">
+								<Key className="w-4 h-4" />
+								Provider
+							</FormLabel>
 							<Select
 								onValueChange={field.onChange}
 								value={field.value}
 								defaultValue={field.value}
 							>
 								<FormControl>
-									<SelectTrigger className="w-full">
+									<SelectTrigger>
 										<SelectValue placeholder="Select a provider" />
 									</SelectTrigger>
 								</FormControl>
@@ -71,18 +74,17 @@ export default function ManageApiKeyForm() {
 						name="api_key"
 						render={({ field }) => (
 							<FormItem>
-								<FormLabel htmlFor="api-key">API Key</FormLabel>
+								<FormLabel>API Key</FormLabel>
 								<FormControl>
 									<Input
-										id="api-key"
 										type="password"
-										placeholder="Enter your API key"
+										placeholder="sk-..."
+										className="font-mono text-sm"
 										{...field}
 									/>
 								</FormControl>
 								<FormDescription>
-									Your API Key is stored securely and only used for your
-									requests.
+									Your API key is encrypted and stored securely
 								</FormDescription>
 								<FormMessage />
 							</FormItem>
@@ -90,24 +92,32 @@ export default function ManageApiKeyForm() {
 					/>
 				)}
 
-				<div className="grid grid-cols-2 gap-2 md:flex">
+				<div className="flex gap-3">
 					<Button
 						onClick={onTestHandler}
 						type="button"
-						className="flex-1"
-						variant="secondary"
+						variant="outline"
 						disabled={isTestApiKeyPending || !providers}
+						className="gap-2"
 					>
-						{isTestApiKeyPending && <LoaderCircle className="animate-spin" />}
-						Test
+						{isTestApiKeyPending ? (
+							<Loader2 className="h-4 w-4 animate-spin" />
+						) : (
+							<TestTube className="h-4 w-4" />
+						)}
+						Test Connection
 					</Button>
 					<Button
 						type="submit"
-						className="flex-1"
 						disabled={isSaveApiKeyPending || !apiKey}
+						className="gap-2"
 					>
-						{isSaveApiKeyPending && <LoaderCircle className="animate-spin" />}
-						Save
+						{isSaveApiKeyPending ? (
+							<Loader2 className="h-4 w-4 animate-spin" />
+						) : (
+							<Save className="h-4 w-4" />
+						)}
+						Save API Key
 					</Button>
 				</div>
 			</form>

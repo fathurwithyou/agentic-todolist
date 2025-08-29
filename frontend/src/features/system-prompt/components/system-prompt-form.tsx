@@ -11,6 +11,7 @@ import {
 	FormItem,
 	FormLabel,
 	FormMessage,
+	FormDescription,
 } from "../../../shared/components/ui/form";
 import { Textarea } from "../../../shared/components/ui/textarea";
 import {
@@ -19,6 +20,7 @@ import {
 } from "../../../shared/repositories/auth/query";
 import { useQueryClient } from "@tanstack/react-query";
 import { useEffect } from "react";
+import { Loader2, Save, RotateCcw } from "lucide-react";
 
 const formSchema = z.object({
 	system_prompt: z.string().min(1, "System prompt is required"),
@@ -66,7 +68,11 @@ export function SystemPromptForm() {
 	};
 
 	if (isLoading) {
-		return <div className="text-sm text-muted-foreground">Loading...</div>;
+		return (
+			<div className="flex items-center justify-center py-8">
+				<Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
+			</div>
+		);
 	}
 
 	return (
@@ -77,11 +83,14 @@ export function SystemPromptForm() {
 					name="system_prompt"
 					render={({ field }) => (
 						<FormItem>
-							<FormLabel>General Knowledge & Context</FormLabel>
+							<FormLabel>Knowledge Base</FormLabel>
+							<FormDescription>
+								Add information that will help AI understand your context better
+							</FormDescription>
 							<FormControl>
 								<Textarea
-									placeholder="Example:&#10;Fathur: fathurwithyou@gmail.com&#10;Office: Jakarta, Menara BCA 15th floor&#10;Meeting Room A: 2nd floor&#10;Team Lead: John (john@company.com)&#10;Regular Meeting: Every Monday 10 AM"
-									className="min-h-[150px]"
+									placeholder="Example:&#10;&#10;Contacts:&#10;• Fathur: fathurwithyou@gmail.com&#10;• John (Team Lead): john@company.com&#10;• Sarah (PM): sarah@company.com&#10;&#10;Locations:&#10;• Main Office: Jakarta, Menara BCA 15th floor&#10;• Meeting Room A: 2nd floor&#10;• Conference Room: 3rd floor&#10;&#10;Regular Events:&#10;• Team Standup: Every Monday 10 AM&#10;• Sprint Review: Every 2 weeks Friday 2 PM"
+									className="min-h-[200px] font-mono text-xs"
 									{...field}
 								/>
 							</FormControl>
@@ -90,18 +99,26 @@ export function SystemPromptForm() {
 					)}
 				/>
 
-				<div className="flex gap-2">
+				<div className="flex gap-3">
 					<Button
 						type="submit"
 						disabled={saveSystemPromptMutation.isPending}
+						className="gap-2"
 					>
-						{saveSystemPromptMutation.isPending ? "Saving..." : "Save"}
+						{saveSystemPromptMutation.isPending ? (
+							<Loader2 className="h-4 w-4 animate-spin" />
+						) : (
+							<Save className="h-4 w-4" />
+						)}
+						Save Changes
 					</Button>
 					<Button
 						type="button"
 						variant="outline"
 						onClick={handleClear}
+						className="gap-2"
 					>
+						<RotateCcw className="h-4 w-4" />
 						Clear
 					</Button>
 				</div>

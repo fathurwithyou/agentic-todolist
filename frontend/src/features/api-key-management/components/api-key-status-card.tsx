@@ -1,44 +1,41 @@
 import { Badge } from "@/shared/components/ui/badge";
-import {
-	Card,
-	CardContent,
-	CardHeader,
-	CardTitle,
-} from "@/shared/components/ui/card";
 import { Skeleton } from "@/shared/components/ui/skeleton";
 import { capitalize } from "@/shared/lib/string";
 import { useGetListApiKeysQuery } from "@/shared/repositories/api-key/query";
-import { CheckCircle2Icon, XCircleIcon } from "lucide-react";
+import { CheckCircle2Icon, XCircleIcon, Key } from "lucide-react";
 
 export default function ApiKeyStatusCard() {
 	const { data } = useGetListApiKeysQuery();
 
 	return (
-		<Card className="bg-accent text-accent-foreground">
-			<CardHeader>
-				<CardTitle>📊 API Key Status</CardTitle>
-			</CardHeader>
-			<CardContent>
-				<div className="flex flex-row gap-4 flex-wrap">
-					{!data ? (
-						<>
-							<Badge className="py-1">
-								<Skeleton className="h-3 w-20 rounded-lg" />
-							</Badge>
-							<Badge className="py-1">
-								<Skeleton className="h-3 w-20 rounded-lg" />
-							</Badge>{" "}
-						</>
-					) : (
-						Object.entries(data.api_keys).map(([provider, isSet]) => (
-							<Badge key={provider} variant={isSet ? "default" : "destructive"}>
-								{isSet ? <CheckCircle2Icon /> : <XCircleIcon />}
-								{capitalize(provider)}: {isSet ? "Saved" : "Not Set"}
-							</Badge>
-						))
-					)}
-				</div>
-			</CardContent>
-		</Card>
+		<div className="rounded-xl bg-muted/30 p-4 space-y-3">
+			<div className="flex items-center gap-2 text-sm font-medium">
+				<Key className="w-4 h-4 text-muted-foreground" />
+				<span>API Key Status</span>
+			</div>
+			<div className="flex flex-row gap-2 flex-wrap">
+				{!data ? (
+					<>
+						<Skeleton className="h-6 w-24 rounded-full" />
+						<Skeleton className="h-6 w-24 rounded-full" />
+					</>
+				) : (
+					Object.entries(data.api_keys).map(([provider, isSet]) => (
+						<Badge 
+							key={provider} 
+							variant={isSet ? "success" : "destructive"}
+							className="gap-1.5"
+						>
+							{isSet ? (
+								<CheckCircle2Icon className="w-3 h-3" />
+							) : (
+								<XCircleIcon className="w-3 h-3" />
+							)}
+							{capitalize(provider)}
+						</Badge>
+					))
+				)}
+			</div>
+		</div>
 	);
 }

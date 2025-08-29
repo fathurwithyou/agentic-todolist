@@ -1,42 +1,34 @@
-import {
-	Card,
-	CardContent,
-	CardHeader,
-	CardTitle,
-} from "@/shared/components/ui/card";
+import { ExternalLink, Info } from "lucide-react";
 
 export default function HowToGetApiKeysCard() {
 	return (
-		<Card className="bg-accent text-accent-foreground">
-			<CardHeader>
-				<CardTitle>💡 How to get API Keys:</CardTitle>
-			</CardHeader>
-			<CardContent>
-				<ul className="text-sm space-y-1 font-manrope">
-					<li>
-						<strong>Google Gemini:</strong>{" "}
-						<a
-							href="https://makersuite.google.com/app/apikey"
-							target="_blank"
-							rel="noopener noreferrer"
-							className="text-blue-600 hover:underline"
-						>
-							Google AI Studio
-						</a>
-					</li>
-					<li>
-						<strong>OpenAI:</strong>{" "}
-						<a
-							href="https://platform.openai.com/api-keys"
-							target="_blank"
-							rel="noopener noreferrer"
-							className="text-blue-600 hover:underline"
-						>
-							OpenAI Platform
-						</a>
-					</li>
-				</ul>
-			</CardContent>
-		</Card>
+		<div className="rounded-xl bg-blue-50 dark:bg-blue-950/20 border border-blue-200 dark:border-blue-900/50 p-4 space-y-3">
+			<div className="flex items-center gap-2 text-sm font-medium text-blue-900 dark:text-blue-400">
+				<Info className="w-4 h-4" />
+				<span>How to get API Keys</span>
+			</div>
+			<div className="space-y-2 text-sm text-blue-800 dark:text-blue-300">
+				<a
+					href="https://makersuite.google.com/app/apikey"
+					target="_blank"
+					rel="noopener noreferrer"
+					className="flex items-center gap-2 hover:underline"
+				>
+					<span className="font-medium">Google Gemini:</span>
+					<span className="text-blue-600 dark:text-blue-400">Google AI Studio</span>
+					<ExternalLink className="w-3 h-3" />
+				</a>
+				<a
+					href="https://platform.openai.com/api-keys"
+					target="_blank"
+					rel="noopener noreferrer"
+					className="flex items-center gap-2 hover:underline"
+				>
+					<span className="font-medium">OpenAI:</span>
+					<span className="text-blue-600 dark:text-blue-400">OpenAI Platform</span>
+					<ExternalLink className="w-3 h-3" />
+				</a>
+			</div>
+		</div>
 	);
 }
