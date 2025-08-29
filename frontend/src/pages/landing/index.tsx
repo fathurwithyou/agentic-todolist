@@ -3,7 +3,7 @@ import { Button } from "@/shared/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/shared/components/ui/card";
 import { useAuth } from "@/shared/hooks/use-auth";
 import { cn } from "@/shared/lib/utils";
-import { ArrowRight, Calendar, Check, Zap } from "lucide-react";
+import { ArrowRight, Calendar, Check, Menu, X, Zap } from "lucide-react";
 import React, { useEffect, useState } from "react";
 
 // Main Landing Page Component
@@ -34,9 +34,9 @@ export default function LandingPage() {
 			<Navbar loginAction={loginWithGoogle} />
 			<main>
 				<HeroSection loginAction={loginWithGoogle} />
-                <hr className="border-dashed border-1 border-muted" />
+				<hr className="border-dashed border-1 border-muted" />
 				<FeaturesSection />
-                <hr className="border-dashed border-1 border-muted" />
+				<hr className="border-dashed border-1 border-muted" />
 				<TestimonialsSection />
 			</main>
 			<Footer />
@@ -44,9 +44,10 @@ export default function LandingPage() {
 	);
 }
 
-// Sticky, translucent Navbar with scroll effect
+// Sticky, translucent Navbar with scroll and mobile responsive effects
 const Navbar = ({ loginAction }: { loginAction: () => void }) => {
 	const [isScrolled, setIsScrolled] = useState(false);
+	const [isMenuOpen, setIsMenuOpen] = useState(false);
 
 	useEffect(() => {
 		const handleScroll = () => {
@@ -60,64 +61,76 @@ const Navbar = ({ loginAction }: { loginAction: () => void }) => {
 		<div
 			className={cn(
 				"fixed top-0 left-0 right-0 z-50 transition-all duration-300 ease-in-out",
-				isScrolled && "pt-4", // Add padding-top when scrolled
+				isScrolled && "pt-4", // Add padding to the container when scrolled
 			)}
 		>
 			<header
 				className={cn(
-					"transition-all duration-300 ease-in-out",
+					"glass transition-all duration-300 ease-in-out relative",
 					isScrolled
-						? "glass mx-auto max-w-4xl rounded-xl border shadow-md"
-						: "w-full",
+						? "mx-auto max-w-4xl rounded-lg border shadow-soft" // Contained width, rounded pill shape
+						: "border-b border-border", // Full width, only bottom border
 				)}
 			>
-				<div
-					className={cn(
-						"container-width flex h-16 items-center justify-between",
-					)}
-				>
+				<div className="container-width flex h-16 items-center justify-between">
 					<div className="flex items-center gap-2">
 						<div className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center shadow-sm">
 							<Calendar className="w-4 h-4 text-primary-foreground" />
 						</div>
 						<h1 className="text-lg font-bold tracking-tighter">CalendarAI</h1>
 					</div>
+					
+					{/* Desktop Navigation */}
 					<nav className="hidden md:flex items-center gap-6 text-sm font-medium">
-						<a
-							href="#features"
-							className="text-muted-foreground hover:text-foreground transition-colors"
-						>
-							Features
-						</a>
-						<a
-							href="#testimonials"
-							className="text-muted-foreground hover:text-foreground transition-colors"
-						>
-							Testimonials
-						</a>
+						<a href="#features" className="text-muted-foreground hover:text-foreground transition-colors">Features</a>
+						<a href="#testimonials" className="text-muted-foreground hover:text-foreground transition-colors">Testimonials</a>
 					</nav>
 					<Button onClick={loginAction} className="hidden md:flex">
 						Get Started
 						<ArrowRight className="w-4 h-4 ml-2" />
 					</Button>
+
+					{/* Mobile Menu Button */}
+					<div className="md:hidden">
+						<Button onClick={() => setIsMenuOpen(!isMenuOpen)} variant="ghost" size="icon">
+							{isMenuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
+						</Button>
+					</div>
 				</div>
+
+				{/* Mobile Menu Dropdown */}
+				{isMenuOpen && (
+					<div className="md:hidden absolute top-full left-0 right-0 p-4">
+						<div className="bg-background border rounded-2xl shadow-lg p-4 space-y-4 animate-in fade-in-20">
+							<nav className="flex flex-col gap-4 text-center">
+								<a href="#features" onClick={() => setIsMenuOpen(false)} className="text-muted-foreground hover:text-foreground transition-colors py-2">Features</a>
+								<a href="#testimonials" onClick={() => setIsMenuOpen(false)} className="text-muted-foreground hover:text-foreground transition-colors py-2">Testimonials</a>
+							</nav>
+							<Button onClick={loginAction} className="w-full">
+								Get Started
+								<ArrowRight className="w-4 h-4 ml-2" />
+							</Button>
+						</div>
+					</div>
+				)}
 			</header>
 		</div>
 	);
 };
+
 
 // Hero Section with a clear value proposition
 const HeroSection = ({ loginAction }: { loginAction: () => void }) => (
 	<section className="pt-32 pb-20 md:pt-40 md:pb-32">
 		<div className="container-width grid md:grid-cols-2 gap-12 items-center">
 			<div className="space-y-6 text-center md:text-left">
-				<h1 className="text-4xl md:text-6xl font-bold tracking-tighter">
+				<h1 className="text-4xl md:text-6xl font-bold tracking-tighter animate-in">
 					Turn any text into a structured calendar
 				</h1>
-				<p className="text-lg text-muted-foreground max-w-xl mx-auto md:mx-0">
+				<p className="text-lg text-muted-foreground max-w-xl mx-auto md:mx-0 animate-in" style={{ animationDelay: "100ms" }}>
 					CalendarAI uses AI to parse your notes, emails, and documents, automatically creating organized events in your Google Calendar.
 				</p>
-				<div className="flex flex-col sm:flex-row gap-4 justify-center md:justify-start">
+				<div className="flex flex-col sm:flex-row gap-4 justify-center md:justify-start animate-in" style={{ animationDelay: "200ms" }}>
 					<Button onClick={loginAction} size="lg" className="h-12 text-base">
 						Get Started for Free
 					</Button>
@@ -140,8 +153,8 @@ const FeaturesSection = () => (
 	<section id="features" className="py-20">
 		<div className="container-width">
 			<div className="text-center space-y-3 mb-12">
-				<h2 className="text-3xl font-bold">Powerful Features, Effortless Scheduling</h2>
-				<p className="text-muted-foreground max-w-2xl mx-auto">
+				<h2 className="text-3xl font-bold fade-in-on-scroll">Powerful Features, Effortless Scheduling</h2>
+				<p className="text-muted-foreground max-w-2xl mx-auto fade-in-on-scroll" style={{ animationDelay: "100ms" }}>
 					From messy notes to perfectly planned events, see how CalendarAI can streamline your workflow.
 				</p>
 			</div>
@@ -185,8 +198,8 @@ const TestimonialsSection = () => (
 	<section id="testimonials" className="py-20">
 		<div className="container-width">
 			<div className="text-center space-y-3 mb-12">
-				<h2 className="text-3xl font-bold">Loved by Professionals</h2>
-				<p className="text-muted-foreground">See what our users are saying about CalendarAI.</p>
+				<h2 className="text-3xl font-bold fade-in-on-scroll">Loved by Professionals</h2>
+				<p className="text-muted-foreground fade-in-on-scroll" style={{ animationDelay: "100ms" }}>See what our users are saying about CalendarAI.</p>
 			</div>
 			<div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
 				<TestimonialCard
