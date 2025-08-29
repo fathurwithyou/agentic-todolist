@@ -1,7 +1,8 @@
+/* src/shared/styles/globals.css */
 @import "tailwindcss";
 
 /* Modern Font Stack */
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display.swap');
 
 @custom-variant dark (&:is(.dark *));
 
@@ -184,7 +185,8 @@
 /* Custom utility classes */
 @layer utilities {
   .glass {
-    @apply backdrop-blur-xl bg-background/80 border border-border;
+    /* Updated for a cleaner header look */
+    @apply backdrop-blur-lg bg-background/80 border-b border-border;
   }
   
   .shadow-soft {
@@ -197,6 +199,17 @@
   
   .animate-in {
     animation: animate-in 0.2s ease;
+  }
+
+  .fade-in-on-scroll {
+    opacity: 0;
+    transform: translateY(10px);
+    transition: opacity 0.5s ease-out, transform 0.5s ease-out;
+  }
+
+  .fade-in-on-scroll.is-visible {
+    opacity: 1;
+    transform: translateY(0);
   }
   
   @keyframes animate-in {
