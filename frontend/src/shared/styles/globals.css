@@ -186,7 +186,7 @@
 @layer utilities {
   .glass {
     /* Updated for a cleaner header look */
-    @apply backdrop-blur-lg bg-background/80 border-b border-border;
+  @apply backdrop-blur-2xl backdrop-saturate-150 bg-background/70 border-b border-border; 
   }
   
   .shadow-soft {

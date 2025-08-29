@@ -43,7 +43,7 @@ export default function LandingPage() {
       <Navbar loginAction={loginWithGoogle} />
       <main>
         <HeroSection loginAction={loginWithGoogle} />
-        <hr className="border-t" /> <LogoCloud />
+        <hr className="border-t" />
         <FeaturesSection />
         <hr className="border-t" />
         <TestimonialsSection />
@@ -71,7 +71,7 @@ const Navbar = ({ loginAction }: { loginAction: () => void }) => {
         className={cn(
           "mx-auto transition-all duration-300",
           isScrolled
-            ? "max-w-4xl px-6 bg-background/95 backdrop-blur-xl border border-border rounded-2xl shadow-soft"
+            ? "glass max-w-4xl px-6 rounded-2xl shadow-soft border"
             : "container-width"
         )}>
         <div className="flex h-14 items-center justify-between">
@@ -175,22 +175,6 @@ const HeroSection = ({ loginAction }: { loginAction: () => void }) => (
             </div>
           </div>
         </Card>
-      </div>
-    </div>
-  </section>
-);
-
-// Logo Cloud
-const LogoCloud = () => (
-  <section className="py-12 border-y border-border/50">
-    <div className="container-width">
-      <p className="text-center text-sm text-muted-foreground mb-8">Trusted by teams at</p>
-      <div className="flex items-center justify-center gap-12 opacity-60 grayscale">
-        {["Google", "Microsoft", "Slack", "Notion", "Linear"].map((company) => (
-          <div key={company} className="text-lg font-semibold">
-            {company}
-          </div>
-        ))}
       </div>
     </div>
   </section>
