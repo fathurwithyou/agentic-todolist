@@ -83,9 +83,6 @@ const Navbar = ({ loginAction }: { loginAction: () => void }) => {
             <a href="#features" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
               Features
             </a>
-            <a href="#how-it-works" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
-              How it Works
-            </a>
             <a href="#testimonials" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
               Testimonials
             </a>
