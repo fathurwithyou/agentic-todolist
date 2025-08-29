@@ -15,10 +15,9 @@ export default function LoginCard() {
 	return (
 		<div className="min-h-screen flex items-center justify-center p-4 bg-background">
 			<div className="w-full max-w-md">
-				{/* Back to home button */}
 				<Button 
 					variant="ghost" 
-					className="mb-8 -ml-2 text-muted-foreground hover:text-foreground transition-colors duration-150"
+					className="mb-8 text-muted-foreground hover:text-foreground transition-colors duration-150 border-1"
 					onClick={() => window.location.href = '/'}
 				>
 					<ArrowLeft className="w-4 h-4 mr-2" />
@@ -27,9 +26,6 @@ export default function LoginCard() {
 
 				<Card className="border-0 shadow-soft">
 					<CardHeader className="text-center space-y-2 px-8 pt-10 pb-8">
-						<div className="w-16 h-16 rounded-2xl bg-primary/10 flex items-center justify-center mx-auto mb-4">
-							<Calendar className="w-8 h-8 text-primary/70" />
-						</div>
 						<CardTitle className="text-2xl font-medium tracking-tight">
 							Welcome back
 						</CardTitle>
