@@ -69,7 +69,7 @@ export function SystemPromptForm() {
 
 	if (isLoading) {
 		return (
-			<div className="flex items-center justify-center py-8">
+			<div className="flex items-center justify-center py-12">
 				<Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
 			</div>
 		);
@@ -83,14 +83,14 @@ export function SystemPromptForm() {
 					name="system_prompt"
 					render={({ field }) => (
 						<FormItem>
-							<FormLabel>Knowledge Base</FormLabel>
-							<FormDescription>
+							<FormLabel className="text-sm font-medium text-foreground/90">Knowledge Base</FormLabel>
+							<FormDescription className="text-xs text-muted-foreground mb-3">
 								Add information that will help AI understand your context better
 							</FormDescription>
 							<FormControl>
 								<Textarea
 									placeholder="Example:&#10;&#10;Contacts:&#10;• Fathur: fathurwithyou@gmail.com&#10;• John (Team Lead): john@company.com&#10;• Sarah (PM): sarah@company.com&#10;&#10;Locations:&#10;• Main Office: Jakarta, Menara BCA 15th floor&#10;• Meeting Room A: 2nd floor&#10;• Conference Room: 3rd floor&#10;&#10;Regular Events:&#10;• Team Standup: Every Monday 10 AM&#10;• Sprint Review: Every 2 weeks Friday 2 PM"
-									className="min-h-[200px] font-mono text-xs"
+									className="min-h-[220px] font-mono text-xs bg-background/50 transition-all duration-150 focus:bg-background"
 									{...field}
 								/>
 							</FormControl>
@@ -99,11 +99,11 @@ export function SystemPromptForm() {
 					)}
 				/>
 
-				<div className="flex gap-3">
+				<div className="flex gap-3 pt-2">
 					<Button
 						type="submit"
 						disabled={saveSystemPromptMutation.isPending}
-						className="gap-2"
+						className="gap-2 transition-all duration-150"
 					>
 						{saveSystemPromptMutation.isPending ? (
 							<Loader2 className="h-4 w-4 animate-spin" />
@@ -116,7 +116,7 @@ export function SystemPromptForm() {
 						type="button"
 						variant="outline"
 						onClick={handleClear}
-						className="gap-2"
+						className="gap-2 transition-all duration-150 hover:bg-muted/50"
 					>
 						<RotateCcw className="h-4 w-4" />
 						Clear

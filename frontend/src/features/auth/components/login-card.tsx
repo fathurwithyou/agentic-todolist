@@ -7,30 +7,42 @@ import {
 	CardTitle,
 } from "@/shared/components/ui/card";
 import { useAuth } from "@/shared/hooks/use-auth";
-import { Calendar, Sparkles } from "lucide-react";
+import { Calendar, Sparkles, Shield, Clock, ArrowLeft } from "lucide-react";
 
 export default function LoginCard() {
 	const { loginWithGoogle, isLoading } = useAuth();
 
 	return (
-		<div className="min-h-screen flex items-center justify-center p-4">
-			<div className="w-full max-w-md animate-in">
-				<Card className="border-0 shadow-xl">
-					<CardHeader className="text-center space-y-6 pt-10 pb-8">
-						<div className="space-y-2">
-							<CardTitle className="text-3xl font-bold tracking-tight">
-								Welcome to CalendarAI
-							</CardTitle>
-							<CardDescription className="text-base">
-								Transform your text into calendar events with AI magic
-							</CardDescription>
+		<div className="min-h-screen flex items-center justify-center p-4 bg-background">
+			<div className="w-full max-w-md">
+				{/* Back to home button */}
+				<Button 
+					variant="ghost" 
+					className="mb-8 -ml-2 text-muted-foreground hover:text-foreground transition-colors duration-150"
+					onClick={() => window.location.href = '/'}
+				>
+					<ArrowLeft className="w-4 h-4 mr-2" />
+					Back to home
+				</Button>
+
+				<Card className="border-0 shadow-soft">
+					<CardHeader className="text-center space-y-2 px-8 pt-10 pb-8">
+						<div className="w-16 h-16 rounded-2xl bg-primary/10 flex items-center justify-center mx-auto mb-4">
+							<Calendar className="w-8 h-8 text-primary/70" />
 						</div>
+						<CardTitle className="text-2xl font-medium tracking-tight">
+							Welcome back
+						</CardTitle>
+						<CardDescription className="text-muted-foreground">
+							Sign in to CalendarAI to continue managing your events
+						</CardDescription>
 					</CardHeader>
-					<CardContent className="pb-10">
-						<div className="space-y-4">
+					
+					<CardContent className="px-8 pb-10">
+						<div className="space-y-6">
 							<Button
 								onClick={loginWithGoogle}
-								className="w-full h-12 text-base font-medium"
+								className="w-full h-12 text-base font-medium transition-all duration-150"
 								size="lg"
 								disabled={isLoading}
 							>
@@ -64,40 +76,74 @@ export default function LoginCard() {
 							
 							<div className="relative">
 								<div className="absolute inset-0 flex items-center">
-									<span className="w-full border-t border-border" />
+									<span className="w-full border-t border-border/40" />
 								</div>
-								<div className="relative flex justify-center text-xs uppercase">
-									<span className="bg-card px-2 text-muted-foreground">
-										Features
+								<div className="relative flex justify-center text-xs">
+									<span className="bg-card px-3 text-muted-foreground">
+										Secure authentication
 									</span>
 								</div>
 							</div>
 							
-							<div className="grid gap-3 text-sm text-muted-foreground">
-								<div className="flex items-center gap-3">
-									<div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center flex-shrink-0">
-										<Sparkles className="w-4 h-4 text-primary" />
+							<div className="space-y-3">
+								<div className="flex items-start gap-3 text-sm text-muted-foreground">
+									<div className="w-8 h-8 rounded-lg bg-muted/30 flex items-center justify-center flex-shrink-0 mt-0.5">
+										<Sparkles className="w-4 h-4 text-primary/60" />
 									</div>
-									<span>AI-powered text parsing</span>
-								</div>
-								<div className="flex items-center gap-3">
-									<div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center flex-shrink-0">
-										<Calendar className="w-4 h-4 text-primary" />
+									<div>
+										<p className="font-medium text-foreground/90 mb-0.5">AI-powered parsing</p>
+										<p className="text-xs">Convert any text format to calendar events instantly</p>
 									</div>
-									<span>Direct Google Calendar integration</span>
 								</div>
-								<div className="flex items-center gap-3">
-									<div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center flex-shrink-0">
-										<svg className="w-4 h-4 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-											<path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-11a4 4 0 11-8 0 4 4 0 018 0z" />
-										</svg>
+								
+								<div className="flex items-start gap-3 text-sm text-muted-foreground">
+									<div className="w-8 h-8 rounded-lg bg-muted/30 flex items-center justify-center flex-shrink-0 mt-0.5">
+										<Clock className="w-4 h-4 text-primary/60" />
 									</div>
-									<span>Secure API key management</span>
+									<div>
+										<p className="font-medium text-foreground/90 mb-0.5">Save hours weekly</p>
+										<p className="text-xs">Automate event creation from emails, docs, and messages</p>
+									</div>
 								</div>
+								
+								<div className="flex items-start gap-3 text-sm text-muted-foreground">
+									<div className="w-8 h-8 rounded-lg bg-muted/30 flex items-center justify-center flex-shrink-0 mt-0.5">
+										<Shield className="w-4 h-4 text-primary/60" />
+									</div>
+									<div>
+										<p className="font-medium text-foreground/90 mb-0.5">Enterprise security</p>
+										<p className="text-xs">Your data is encrypted and never stored permanently</p>
+									</div>
+								</div>
+							</div>
+							
+							<div className="pt-4 text-center">
+								<p className="text-xs text-muted-foreground">
+									By continuing, you agree to our{" "}
+									<a href="#" className="text-primary/80 hover:text-primary transition-colors duration-150">
+										Terms of Service
+									</a>{" "}
+									and{" "}
+									<a href="#" className="text-primary/80 hover:text-primary transition-colors duration-150">
+										Privacy Policy
+									</a>
+								</p>
 							</div>
 						</div>
 					</CardContent>
 				</Card>
+				
+				<div className="mt-8 text-center">
+					<p className="text-sm text-muted-foreground">
+						Don't have an account?{" "}
+						<button 
+							onClick={loginWithGoogle}
+							className="text-primary/80 hover:text-primary transition-colors duration-150 font-medium"
+						>
+							Sign up for free
+						</button>
+					</p>
+				</div>
 			</div>
 		</div>
 	);

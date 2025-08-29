@@ -41,8 +41,8 @@ export default function ManageApiKeyForm() {
 					name="provider"
 					render={({ field }) => (
 						<FormItem>
-							<FormLabel className="flex items-center gap-2">
-								<Key className="w-4 h-4" />
+							<FormLabel className="flex items-center gap-2 text-sm font-medium text-foreground/90">
+								<Key className="w-3.5 h-3.5 text-muted-foreground" />
 								Provider
 							</FormLabel>
 							<Select
@@ -51,7 +51,7 @@ export default function ManageApiKeyForm() {
 								defaultValue={field.value}
 							>
 								<FormControl>
-									<SelectTrigger>
+									<SelectTrigger className="transition-all duration-150">
 										<SelectValue placeholder="Select a provider" />
 									</SelectTrigger>
 								</FormControl>
@@ -74,16 +74,16 @@ export default function ManageApiKeyForm() {
 						name="api_key"
 						render={({ field }) => (
 							<FormItem>
-								<FormLabel>API Key</FormLabel>
+								<FormLabel className="text-sm font-medium text-foreground/90">API Key</FormLabel>
 								<FormControl>
 									<Input
 										type="password"
 										placeholder="sk-..."
-										className="font-mono text-sm"
+										className="font-mono text-sm transition-all duration-150"
 										{...field}
 									/>
 								</FormControl>
-								<FormDescription>
+								<FormDescription className="text-xs text-muted-foreground">
 									Your API key is encrypted and stored securely
 								</FormDescription>
 								<FormMessage />
@@ -92,13 +92,13 @@ export default function ManageApiKeyForm() {
 					/>
 				)}
 
-				<div className="flex gap-3">
+				<div className="flex gap-3 pt-2">
 					<Button
 						onClick={onTestHandler}
 						type="button"
 						variant="outline"
 						disabled={isTestApiKeyPending || !providers}
-						className="gap-2"
+						className="gap-2 transition-all duration-150 hover:bg-muted/50"
 					>
 						{isTestApiKeyPending ? (
 							<Loader2 className="h-4 w-4 animate-spin" />
@@ -110,7 +110,7 @@ export default function ManageApiKeyForm() {
 					<Button
 						type="submit"
 						disabled={isSaveApiKeyPending || !apiKey}
-						className="gap-2"
+						className="gap-2 transition-all duration-150"
 					>
 						{isSaveApiKeyPending ? (
 							<Loader2 className="h-4 w-4 animate-spin" />

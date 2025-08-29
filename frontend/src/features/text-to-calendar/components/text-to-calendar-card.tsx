@@ -18,21 +18,21 @@ export default function TextToCalendarCard() {
 	>("primary");
 
 	return (
-		<Card className="overflow-hidden">
-			<CardHeader className="border-b border-border/50 bg-gradient-to-r from-primary/5 to-primary/10">
+		<Card className="border-0 shadow-soft overflow-visible">
+			<CardHeader className="border-b border-border/40 bg-gradient-to-r from-muted/10 to-muted/20 px-8 py-6">
 				<div className="flex items-start justify-between">
-					<div className="space-y-1">
-						<CardTitle className="flex items-center gap-2">
-							<Sparkles className="w-5 h-5" />
+					<div className="space-y-1.5">
+						<CardTitle className="flex items-center gap-2.5 text-2xl font-medium">
+							<Sparkles className="w-5 h-5 text-primary/70" />
 							Convert Text to Events
 						</CardTitle>
-						<CardDescription>
+						<CardDescription className="text-muted-foreground">
 							Paste your timeline text and let AI create calendar events
 						</CardDescription>
 					</div>
 				</div>
 			</CardHeader>
-			<CardContent className="p-6 space-y-6">
+			<CardContent className="p-8 space-y-6">
 				<PreviewTimelineForm
 					onSuccess={(events, targetCalendarId) => {
 						setCreatedEvents(events);

@@ -1,4 +1,4 @@
-// src/pages/app/index.tsx
+
 import ApiKeyManagementCard from "@/features/api-key-management/components/api-key-management-card";
 import { SystemPromptManagementCard } from "@/features/system-prompt/components/system-prompt-management-card";
 import TextToCalendarCard from "@/features/text-to-calendar/components/text-to-calendar-card";
@@ -11,10 +11,12 @@ import {
 } from "@/shared/components/ui/tabs";
 import { useAuth } from "@/shared/hooks/use-auth";
 import { Calendar, Key, Settings } from "lucide-react";
-import LandingPage from "../landing"; // <-- Import the new landing page
+import LandingPage from "../landing";
+import LoginPage from "../login"; // Import the login page
 
 export default function AppPages() {
 	const { isAuthenticated, isLoading } = useAuth();
+	const isLoginPage = window.location.pathname === '/login';
 
 	if (isLoading) {
 		return (
@@ -28,12 +30,14 @@ export default function AppPages() {
 		);
 	}
 
-	// Show LandingPage if not authenticated
+	if (isLoginPage) {
+		return <LoginPage />;
+	}
+
 	if (!isAuthenticated) {
 		return <LandingPage />;
 	}
 
-	// Show the main application dashboard after login
 	return (
 		<div className="min-h-screen">
 			<Header />
