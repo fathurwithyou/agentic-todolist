@@ -361,7 +361,7 @@ const HeroSection = ({ loginAction }: { loginAction: () => void }) => (
         
         <h1 className="text-5xl md:text-7xl font-bold tracking-tighter animate-in" style={{ animationDelay: "100ms" }}>
           Transform text into
-          <span className="block text-transparent bg-clip-text bg-gradient-to-r from-primary via-primary/80 to-primary/60">
+          <span className="pb-4 block text-transparent bg-clip-text bg-gradient-to-r from-primary via-primary/80 to-primary/60">
             perfectly organized events
           </span>
         </h1>
@@ -409,7 +409,7 @@ const HeroSection = ({ loginAction }: { loginAction: () => void }) => (
 
 // Features Section
 const FeaturesSection = () => (
-  <section id="features" className="py-24">
+  <section id="features">
     <div className="container-width">
       <div className="text-center max-w-3xl mx-auto mb-16 space-y-4">
         <h2 className="text-4xl font-bold tracking-tight fade-in-on-scroll">
