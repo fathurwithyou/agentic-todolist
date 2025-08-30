@@ -22,10 +22,7 @@ export const previewTimeline = async (req: PreviewTimelineRequest) => {
 		"/api/v1/timeline/preview",
 		{
 			method: "POST",
-			body: JSON.stringify(req),
-			headers: {
-				"Content-Type": "application/json",
-			},
+			data: req,
 		},
 	);
 
@@ -37,10 +34,7 @@ export const createEventsFromTimeline = async (
 ) => {
 	const response = await jsonFetcher("/api/v1/timeline/create-events", {
 		method: "POST",
-		body: JSON.stringify(req),
-		headers: {
-			"Content-Type": "application/json",
-		},
+		data: req,
 	});
 
 	return response;

@@ -45,6 +45,7 @@ class FileAuthRepository(AuthRepository):
             "google_calendar_token_expiry": user.google_calendar_token_expiry.isoformat()
             if user.google_calendar_token_expiry
             else None,
+            "system_prompt": user.system_prompt,
         }
 
         # Remove existing user with same ID
@@ -242,4 +243,5 @@ class FileAuthRepository(AuthRepository):
                 "google_calendar_refresh_token"
             ),
             google_calendar_token_expiry=google_calendar_token_expiry,
+            system_prompt=user_data.get("system_prompt"),
         )

@@ -2,7 +2,7 @@ import { z } from "zod";
 
 export const SaveApiKeySchema = z.object({
 	provider: z.string().min(2).max(100),
-	api_key: z.string().min(10).max(100),
+	api_key: z.string().min(10).max(500),
 });
 
 export type SaveApiKeyRequest = z.infer<typeof SaveApiKeySchema>;
