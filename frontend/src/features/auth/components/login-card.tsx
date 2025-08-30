@@ -7,7 +7,7 @@ import {
 	CardTitle,
 } from "@/shared/components/ui/card";
 import { useAuth } from "@/shared/hooks/use-auth";
-import { Calendar, Sparkles, Shield, Clock, ArrowLeft } from "lucide-react";
+import { Sparkles, Shield, Clock, ArrowLeft } from "lucide-react";
 
 export default function LoginCard() {
 	const { loginWithGoogle, isLoading } = useAuth();
@@ -15,8 +15,8 @@ export default function LoginCard() {
 	return (
 		<div className="min-h-screen flex items-center justify-center p-4 bg-background">
 			<div className="w-full max-w-md">
-				<Button 
-					variant="ghost" 
+				<Button
+					variant="ghost"
 					className="mb-8 text-muted-foreground hover:text-foreground transition-colors duration-150 border-1"
 					onClick={() => window.location.href = '/'}
 				>
@@ -33,7 +33,7 @@ export default function LoginCard() {
 							Sign in to CalendarAI to continue managing your events
 						</CardDescription>
 					</CardHeader>
-					
+
 					<CardContent className="px-8 pb-10">
 						<div className="space-y-6">
 							<Button
@@ -69,7 +69,7 @@ export default function LoginCard() {
 									</>
 								)}
 							</Button>
-							
+
 							<div className="relative">
 								<div className="absolute inset-0 flex items-center">
 									<span className="w-full border-t border-border/40" />
@@ -80,7 +80,7 @@ export default function LoginCard() {
 									</span>
 								</div>
 							</div>
-							
+
 							<div className="space-y-3">
 								<div className="flex items-start gap-3 text-sm text-muted-foreground">
 									<div className="w-8 h-8 rounded-lg bg-muted/30 flex items-center justify-center flex-shrink-0 mt-0.5">
@@ -91,7 +91,7 @@ export default function LoginCard() {
 										<p className="text-xs">Convert any text format to calendar events instantly</p>
 									</div>
 								</div>
-								
+
 								<div className="flex items-start gap-3 text-sm text-muted-foreground">
 									<div className="w-8 h-8 rounded-lg bg-muted/30 flex items-center justify-center flex-shrink-0 mt-0.5">
 										<Clock className="w-4 h-4 text-primary/60" />
@@ -101,7 +101,7 @@ export default function LoginCard() {
 										<p className="text-xs">Automate event creation from emails, docs, and messages</p>
 									</div>
 								</div>
-								
+
 								<div className="flex items-start gap-3 text-sm text-muted-foreground">
 									<div className="w-8 h-8 rounded-lg bg-muted/30 flex items-center justify-center flex-shrink-0 mt-0.5">
 										<Shield className="w-4 h-4 text-primary/60" />
@@ -112,7 +112,7 @@ export default function LoginCard() {
 									</div>
 								</div>
 							</div>
-							
+
 							<div className="pt-4 text-center">
 								<p className="text-xs text-muted-foreground">
 									By continuing, you agree to our{" "}
@@ -128,11 +128,11 @@ export default function LoginCard() {
 						</div>
 					</CardContent>
 				</Card>
-				
+
 				<div className="mt-8 text-center">
 					<p className="text-sm text-muted-foreground">
 						Don't have an account?{" "}
-						<button 
+						<button
 							onClick={loginWithGoogle}
 							className="text-primary/80 hover:text-primary transition-colors duration-150 font-medium"
 						>

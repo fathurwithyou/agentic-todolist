@@ -45,7 +45,7 @@ export default function PreviewTimelineForm({ onSuccess }: Props) {
 
 	const { data: models, isLoading: isLoadingModels } = useGetModelsQuery(
 		llmProvider,
-		hasApiKey,
+		hasApiKey ?? false,
 	);
 
 	return (
@@ -113,7 +113,7 @@ export default function PreviewTimelineForm({ onSuccess }: Props) {
 						/>
 					)}
 				</div>
-				
+
 				<FormField
 					control={form.control}
 					name="target_calendar_id"
@@ -148,7 +148,7 @@ export default function PreviewTimelineForm({ onSuccess }: Props) {
 						</FormItem>
 					)}
 				/>
-				
+
 				<FormField
 					control={form.control}
 					name="timeline_text"
@@ -169,7 +169,7 @@ export default function PreviewTimelineForm({ onSuccess }: Props) {
 						</FormItem>
 					)}
 				/>
-				
+
 				<FormField
 					control={form.control}
 					name="flexible"
@@ -193,7 +193,7 @@ export default function PreviewTimelineForm({ onSuccess }: Props) {
 						</FormItem>
 					)}
 				/>
-				
+
 				<Button
 					type="submit"
 					className="w-full h-11 gap-2.5 transition-all duration-150"
