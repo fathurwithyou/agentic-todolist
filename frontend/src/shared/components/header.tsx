@@ -45,7 +45,7 @@ export default function Header() {
 								<DropdownMenuLabel className="flex items-center gap-3">
 									<Avatar className="h-8 w-8">
 										<AvatarImage
-											src={user.picture}
+											src={user.picture || undefined}
 											alt={user.name || "User Avatar"}
 										/>
 										<AvatarFallback className="text-xs">
@@ -76,7 +76,7 @@ export default function Header() {
 										<Button variant="ghost" className="relative h-10 w-10 rounded-xl p-0">
 											<Avatar className="h-10 w-10">
 												<AvatarImage
-													src={user.picture}
+													src={user.picture || undefined}
 													alt={user.name || "User Avatar"}
 												/>
 												<AvatarFallback>

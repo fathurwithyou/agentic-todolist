@@ -113,7 +113,8 @@ async def google_callback(request: Request):
         jwt_token = auth_service.create_jwt_token(session)
 
         # Redirect to frontend with token
-        frontend_url = f"http://localhost:8000/?token={jwt_token}"
+        frontend_base_url = os.getenv("FRONTEND_URL", "http://localhost:5173")
+        frontend_url = f"{frontend_base_url}/?token={jwt_token}"
         return RedirectResponse(url=frontend_url)
 
     except Exception as e:
