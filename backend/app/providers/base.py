@@ -85,7 +85,7 @@ REQUIRED OUTPUT FORMAT (JSON only, no other text):
       "start_time": "HH:MM",
       "end_time": "HH:MM",
       "description": "Formatted description, get all information you can",
-      "attendees": ["participant1", "participant2"],
+      "attendees": ["participant1@example.com", "participant2@example.com"],
       "location": "Event location or venue",
       "all_day": false,
       "status": "confirmed",
