@@ -20,7 +20,14 @@ export default function AppPages() {
 
 	if (isLoading) {
 		return (
-			<div className="min-h-screen flex items-center justify-center bg-background">
+			<div className="min-h-screen flex items-center justify-center bg-background relative">
+				<div 
+					className="absolute inset-0 opacity-[0.3] pointer-events-none" 
+					style={{
+						backgroundImage: 'radial-gradient(circle, rgb(0 0 0 / 0.3) 1px, transparent 1px)',
+						backgroundSize: '18px 18px'
+					}}
+				/>
 				<div className="animate-pulse">
 					<div className="w-12 h-12 bg-primary/20 rounded-xl flex items-center justify-center">
 						<Calendar className="w-6 h-6 text-primary" />
@@ -39,7 +46,14 @@ export default function AppPages() {
 	}
 
 	return (
-		<div className="min-h-screen">
+		<div className="min-h-screen relative">
+			<div 
+				className="absolute inset-0 opacity-[0.3] pointer-events-none" 
+				style={{
+					backgroundImage: 'radial-gradient(circle, rgb(0 0 0 / 0.3) 1px, transparent 1px)',
+					backgroundSize: '18px 18px'
+				}}
+			/>
 			<Header />
 			<main className="container-width pb-8">
 				<div className="animate-in">

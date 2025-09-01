@@ -16,8 +16,8 @@ export default function TextToCalendarCard() {
 	const form = useCreateEventsFromTimelineForm();
 
 	return (
-		<Card className="border-0 shadow-soft overflow-visible">
-			<CardHeader className="border-b border-border/40 bg-gradient-to-r from-muted/10 to-muted/20 px-8 py-6">
+		<Card className="border-0 shadow-soft overflow-visible relative">
+			<CardHeader className="border-b border-border/40 bg-gradient-to-r from-muted/10 to-muted/20 px-8 py-6 relative">
 				<div className="flex items-start justify-between">
 					<div className="space-y-1.5">
 						<CardTitle className="flex items-center gap-2.5 text-2xl font-medium">
@@ -30,7 +30,7 @@ export default function TextToCalendarCard() {
 					</div>
 				</div>
 			</CardHeader>
-			<CardContent className="p-8 space-y-6">
+			<CardContent className="p-8 space-y-6 relative">
 				<PreviewTimelineForm
 					onSuccess={(events, targetCalendarId) => {
 						form.setValue("events", events);

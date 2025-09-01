@@ -1,7 +1,5 @@
 /* frontend/src/shared/styles/globals.css */
 @import "tailwindcss";
-
-/* Modern Font Stack - Cal.com uses Inter */
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
 
 @custom-variant dark (&:is(.dark *));
@@ -133,7 +131,7 @@
     -moz-osx-font-smoothing: grayscale;
   }
   
-  /* Subtle grid background like Cal.com */
+  /* Subtle dot pattern background */
   body::before {
     content: '';
     position: fixed;
@@ -142,12 +140,10 @@
     right: 0;
     bottom: 0;
     pointer-events: none;
-    background-image: 
-      linear-gradient(var(--grid-color) 1px, transparent 1px),
-      linear-gradient(90deg, var(--grid-color) 1px, transparent 1px);
-    background-size: var(--grid-size) var(--grid-size);
+    background-image: radial-gradient(circle, var(--grid-color) 1px, transparent 1px);
+    background-size: 20px 20px;
     z-index: -1;
-    opacity: 0.4;
+    opacity: 0.3;
   }
   
   /* Cal.com Typography */

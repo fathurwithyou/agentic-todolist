@@ -13,7 +13,14 @@ export default function LoginCard() {
 	const { loginWithGoogle, isLoading } = useAuth();
 
 	return (
-		<div className="min-h-screen flex items-center justify-center p-4 bg-background">
+		<div className="min-h-screen flex items-center justify-center p-4 bg-background relative">
+			<div 
+				className="absolute inset-0 opacity-[0.3] pointer-events-none" 
+				style={{
+					backgroundImage: 'radial-gradient(circle, rgb(0 0 0 / 0.3) 1px, transparent 1px)',
+					backgroundSize: '18px 18px'
+				}}
+			/>
 			<div className="w-full max-w-md">
 				<Button
 					variant="ghost"
