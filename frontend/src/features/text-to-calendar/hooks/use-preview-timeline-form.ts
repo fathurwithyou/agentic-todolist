@@ -24,7 +24,7 @@ export const usePreviewTimelineForm = ({ onSuccess }: Props) => {
 		defaultValues: {
 			flexible: false,
 			llm_provider: undefined,
-			llm_model: undefined,
+			llm_model: "gemini-2.5-flash", // TODO: change to undefined when api models endpoint is fixed
 			timeline_text: "",
 			target_calendar_id: "primary",
 		},

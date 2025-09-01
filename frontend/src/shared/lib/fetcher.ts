@@ -1,46 +1,51 @@
-const API_BASE_URL = "http://localhost:8000";
+import axios, { type AxiosRequestConfig } from "axios";
 
-export const apiFetcher = async (
-	url: string,
-	options?: RequestInit,
-): Promise<Response> => {
-	const token = localStorage.getItem("token");
+const API_HOST = import.meta.env.VITE_API_HOST;
+const API_PORT = import.meta.env.VITE_API_PORT;
 
-	let optionsWithAuth = options;
-	if (token) {
-		optionsWithAuth = {
-			...options,
-			headers: {
-				...options?.headers,
-				Authorization: `Bearer ${token}`,
-			},
-		};
-	}
+const api = axios.create({
+  baseURL: `${API_HOST}:${API_PORT}`,
+});
 
-	console.info(
-		`[apiFetcher] Request: ${optionsWithAuth?.method || "GET"} ${url}`,
-		optionsWithAuth?.body ? { body: optionsWithAuth.body } : {},
-	);
+api.interceptors.request.use((config) => {
+  const token = localStorage.getItem("token");
+  if (token) {
+    config.headers.Authorization = `Bearer ${token}`;
+  }
+  return config;
+});
 
-	return fetch(`${API_BASE_URL}${url}`, optionsWithAuth);
+export const apiFetcher = async <T>(
+  url: string,
+  options?: AxiosRequestConfig,
+): Promise<T> => {
+  console.info(
+    `[apiFetcher] Request: ${options?.method || "GET"} ${url}`,
+    options?.data ? { body: options.data } : {},
+  );
+  const response = await api.request<T>({ url, ...options });
+  return response.data;
 };
 
 export const jsonFetcher = async <T>(
-	url: string,
-	options?: RequestInit,
+  url: string,
+  options?: AxiosRequestConfig,
 ): Promise<T> => {
-	const response = await apiFetcher(url, options);
-
-	const body = await response.json();
-
-	console.info(
-		`[jsonFetcher] Response: ${options?.method || "GET"} ${url} ${response.status}`,
-		body,
-	);
-
-	if (!response.ok) {
-		throw new Error(`${body.message || "Unknown error"}`);
-	}
-
-	return body;
+  try {
+    const response = await apiFetcher<T>(url, options);
+    console.info(
+      `[jsonFetcher] Response: ${options?.method || "GET"} ${url}`,
+      response,
+    );
+    return response;
+  } catch (error) {
+    if (axios.isAxiosError(error)) {
+      console.error(
+        `[jsonFetcher] Error: ${options?.method || "GET"} ${url}`,
+        error.response?.data,
+      );
+      throw new Error(error.response?.data?.message || "Unknown error");
+    }
+    throw error;
+  }
 };

@@ -12,9 +12,8 @@ import uvicorn
 
 from app.utils.logging import setup_logging
 from app.config.settings import get_config
-from app.services.calendar_service import calendar_service
 from app.api.v1 import health  # Keep health check from v1
-from app.api import auth, llm, calendar, api_keys, timeline
+from app.api import auth, calendar, api_keys, timeline
 
 
 # Set up logging
@@ -27,9 +26,8 @@ async def lifespan(app: FastAPI):
     # Startup
     print("Starting FastAPI application...")
 
-    # Initialize calendar service
-    if not calendar_service.authenticate():
-        print("Warning: Google Calendar authentication failed")
+    # Calendar service initialization moved to per-request basis
+    print("Calendar service will be initialized per user request")
 
     yield
 
@@ -61,9 +59,6 @@ app.include_router(
     auth.router
 )  # Also include auth routes at root level for backward compatibility
 app.include_router(api_keys.router, prefix="/api/v1")
-app.include_router(
-    llm.router, prefix="/api/v1"
-)  # LLM/API key management (/api/v1/api-keys/*)
 app.include_router(
     calendar.router, prefix="/api/v1"
 )  # Calendar API (/api/v1/calendar/*)

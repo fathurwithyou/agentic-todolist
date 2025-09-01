@@ -6,10 +6,16 @@ import logging
 from fastapi import APIRouter, HTTPException, status
 
 from app.schemas.health import HealthResponse
-from app.services.llm_service import llm_service
-from app.services.calendar_service import calendar_service
+from app.domains.llm.service import LLMService
+from app.domains.llm.encryption import APIKeyEncryption
+from app.infrastructure.llm_repository import FileLLMRepository
 
 logger = logging.getLogger(__name__)
+
+# Initialize LLM service
+llm_repository = FileLLMRepository()
+encryption = APIKeyEncryption()
+llm_service = LLMService(llm_repository, encryption)
 
 router = APIRouter(tags=["health"])
 
@@ -19,11 +25,11 @@ async def health_check():
     """Health check endpoint"""
     try:
         # Check LLM configuration
-        llm_status = llm_service.get_provider_status()
-        llm_configured = llm_status["initialized"]
+        llm_providers = llm_service.get_available_providers()
+        llm_configured = len(llm_providers) > 0
 
-        # Check calendar authentication
-        calendar_authenticated = calendar_service.creds is not None
+        # Calendar authentication is checked per user
+        calendar_authenticated = True  # Always available for authenticated users
 
         return HealthResponse(
             status="healthy"
@@ -31,7 +37,7 @@ async def health_check():
             else "degraded",
             llm_configured=llm_configured,
             calendar_authenticated=calendar_authenticated,
-            llm_providers=llm_status,
+            llm_providers={"providers": llm_providers},
         )
     except Exception as e:
         raise HTTPException(

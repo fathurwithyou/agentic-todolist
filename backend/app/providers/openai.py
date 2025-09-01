@@ -4,7 +4,7 @@ OpenAI GPT provider implementation.
 
 import json
 import logging
-from typing import List
+from typing import List, Optional
 
 from app.providers.base import LLMProvider
 from app.domains.calendar.models import (
@@ -51,7 +51,7 @@ class OpenAIProvider(LLMProvider):
         """Check if OpenAI is properly configured"""
         return self.api_key is not None and self.client is not None
 
-    async def parse_timeline(self, timeline_text: str) -> List[ParsedEvent]:
+    async def parse_timeline(self, timeline_text: str, system_prompt: Optional[str] = None) -> List[ParsedEvent]:
         """Parse timeline using OpenAI GPT"""
         if not self.is_available():
             logger.error("OpenAI provider not properly initialized")
@@ -63,7 +63,7 @@ class OpenAIProvider(LLMProvider):
             )
 
             # Create prompt
-            prompt = self._create_parsing_prompt(timeline_text)
+            prompt = self._create_parsing_prompt(timeline_text, system_prompt)
 
             # Generate response
             logger.info("Calling OpenAI API...")

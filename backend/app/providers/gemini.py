@@ -5,7 +5,7 @@ Google Gemini LLM provider implementation.
 import json
 import asyncio
 import logging
-from typing import List
+from typing import List, Optional
 
 from app.providers.base import LLMProvider
 from app.domains.calendar.models import (
@@ -62,7 +62,7 @@ class GeminiProvider(LLMProvider):
         """Check if Gemini is properly configured"""
         return self.api_key is not None and self.model is not None
 
-    async def parse_timeline(self, timeline_text: str) -> List[ParsedEvent]:
+    async def parse_timeline(self, timeline_text: str, system_prompt: Optional[str] = None) -> List[ParsedEvent]:
         """Parse timeline using Gemini"""
         if not self.is_available():
             logger.error("Gemini provider not properly initialized")
@@ -72,9 +72,11 @@ class GeminiProvider(LLMProvider):
             logger.info(
                 f"Parsing timeline with Gemini ({self.model_name}): {timeline_text[:100]}..."
             )
+            
+            logger.info(f"Using system prompt: {system_prompt}")
 
             # Create prompt
-            prompt = self._create_parsing_prompt(timeline_text)
+            prompt = self._create_parsing_prompt(timeline_text, system_prompt)
             logger.debug(f"Generated prompt: {prompt[:200]}...")
 
             # Generate response

@@ -49,10 +49,17 @@ class CalendarService:
                 f"Please save an API key in the API Keys tab."
             )
 
+        # Get user's system prompt
+        from ...infrastructure.auth_repository import FileAuthRepository
+        auth_repository = FileAuthRepository()
+        user = auth_repository.get_user(request.user_id)
+        system_prompt = user.system_prompt if user else None
+        logger.info(f"System prompt {system_prompt}")
+
         # Parse timeline using LLM
         try:
             events = await self._parse_with_llm(
-                request.timeline_text, provider, model, api_key, request.flexible
+                request.timeline_text, provider, model, api_key, request.flexible, system_prompt
             )
 
             processing_time = int((datetime.now() - start_time).total_seconds() * 1000)
@@ -82,7 +89,7 @@ class CalendarService:
     ) -> CalendarEvent:
         """Create a calendar event from parsed event"""
         from ...infrastructure.auth_repository import FileAuthRepository
-        from ...services.user_calendar_service import UserCalendarService
+        from .user_service import UserCalendarService
 
         # Get user and create Google Calendar event
         auth_repository = FileAuthRepository()
@@ -215,6 +222,7 @@ class CalendarService:
         model: str,
         api_key: str,
         flexible: bool,
+        system_prompt: Optional[str] = None,
     ) -> List[ParsedEvent]:
         """Parse timeline using LLM provider"""
         # This would integrate with the existing LLM providers
@@ -229,7 +237,7 @@ class CalendarService:
             raise ValueError(f"Failed to create provider: {provider.value}")
 
         await llm_provider.initialize()
-        events = await llm_provider.parse_timeline(timeline_text)
+        events = await llm_provider.parse_timeline(timeline_text, system_prompt)
 
         return events
 
