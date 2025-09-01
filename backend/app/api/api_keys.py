@@ -144,6 +144,42 @@ async def remove_api_key(provider: str, current_user=Depends(get_current_user)):
         raise HTTPException(status_code=500, detail="Failed to remove API key")
 
 
+@router.get("/models/{provider}")
+async def get_provider_models(provider: str, current_user=Depends(get_current_user)):
+    """Get available models for a specific provider"""
+    try:
+        # Convert string to enum
+        try:
+            provider_enum = ProviderType(provider.lower())
+        except ValueError:
+            raise HTTPException(
+                status_code=400, detail=f"Unsupported provider: {provider}"
+            )
+
+        # For Gemini, get models dynamically from the API
+        if provider_enum == ProviderType.GEMINI:
+            api_key = llm_service.get_api_key(current_user.user.user_id, provider_enum)
+            if not api_key:
+                raise HTTPException(
+                    status_code=400, detail="No API key found for Gemini. Please save your API key first."
+                )
+            
+            models = await llm_service.get_dynamic_provider_models(provider_enum, api_key)
+        else:
+            # For other providers, use static list
+            models = llm_service.get_provider_models(provider_enum)
+        
+        return {
+            "provider": provider,
+            "models": models,
+        }
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Failed to get models for {provider}: {e}")
+        raise HTTPException(status_code=500, detail="Failed to get models")
+
+
 @router.get("/providers")
 async def get_available_providers():
     """Get list of available LLM providers"""
