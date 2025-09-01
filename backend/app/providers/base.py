@@ -41,8 +41,10 @@ class LLMProvider(ABC):
         context_section = ""
         if system_prompt:
             context_section = f"""
-CONTEXT & KNOWLEDGE:
+ADDITIONAL CONTEXT:
 {system_prompt}
+
+Use this context to better understand the timeline and extract more accurate information. This may include name-to-email mappings, default settings, preferences, or other relevant information.
 
 """
         
@@ -71,6 +73,7 @@ INSTRUCTIONS:
 16. For single dates, use the same date for both start and end
 17. If times are provided, extract start_time and end_time; if only one time, use as start_time
 18. Accept various time formats: "09:00", "9 AM", "pukul 14:00", "jam 15:30"
+19. Use any provided context above to enhance accuracy (e.g., resolve names to emails, apply default settings, etc.)
 
 REQUIRED OUTPUT FORMAT (JSON only, no other text):
 {{
@@ -82,7 +85,7 @@ REQUIRED OUTPUT FORMAT (JSON only, no other text):
       "start_time": "HH:MM",
       "end_time": "HH:MM",
       "description": "Formatted description, get all information you can",
-      "attendees": ["Name1", "Name2"],
+      "attendees": ["participant1", "participant2"],
       "location": "Event location or venue",
       "all_day": false,
       "status": "confirmed",

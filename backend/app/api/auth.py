@@ -7,14 +7,14 @@ import os
 import logging
 from typing import Optional
 from datetime import datetime, timedelta
-from fastapi import APIRouter, Request, HTTPException, Depends, Body
+from fastapi import APIRouter, Request, HTTPException, Depends
 from fastapi.responses import RedirectResponse
 from pydantic import BaseModel
 
 from ..domains.auth.service import AuthService
 from ..domains.auth.models import User
 from ..infrastructure.auth_repository import FileAuthRepository
-from ..services.google_oauth_service import google_oauth_service
+from ..domains.auth.google_oauth_service import google_oauth_service
 
 logger = logging.getLogger(__name__)
 
@@ -171,7 +171,7 @@ async def get_calendar_status(current_user: User = Depends(get_current_user)):
 
     token_expired = False
     if has_calendar_access and user.google_calendar_token_expiry:
-        from ..services.google_oauth_service import google_oauth_service
+        from ..domains.auth.google_oauth_service import google_oauth_service
 
         token_expired = google_oauth_service.is_token_expired(
             user.google_calendar_token_expiry

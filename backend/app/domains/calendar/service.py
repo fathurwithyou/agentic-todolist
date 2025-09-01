@@ -54,6 +54,7 @@ class CalendarService:
         auth_repository = FileAuthRepository()
         user = auth_repository.get_user(request.user_id)
         system_prompt = user.system_prompt if user else None
+        logger.info(f"System prompt {system_prompt}")
 
         # Parse timeline using LLM
         try:
@@ -88,7 +89,7 @@ class CalendarService:
     ) -> CalendarEvent:
         """Create a calendar event from parsed event"""
         from ...infrastructure.auth_repository import FileAuthRepository
-        from ...services.user_calendar_service import UserCalendarService
+        from .user_service import UserCalendarService
 
         # Get user and create Google Calendar event
         auth_repository = FileAuthRepository()

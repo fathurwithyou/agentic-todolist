@@ -16,7 +16,7 @@ from .auth import get_current_user
 
 logger = logging.getLogger(__name__)
 
-# Initialize dependencies
+# Initialize domain service
 llm_repository = FileLLMRepository()
 encryption = APIKeyEncryption()
 llm_service = LLMService(llm_repository, encryption)

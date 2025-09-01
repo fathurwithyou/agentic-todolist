@@ -9,7 +9,7 @@ from typing import List, Optional
 from fastapi import APIRouter, HTTPException, Depends, Query
 from pydantic import BaseModel
 
-from ..services.user_calendar_service import create_user_calendar_service
+from ..domains.calendar.user_service import create_user_calendar_service
 from .auth import get_current_user
 
 logger = logging.getLogger(__name__)

@@ -72,6 +72,8 @@ class GeminiProvider(LLMProvider):
             logger.info(
                 f"Parsing timeline with Gemini ({self.model_name}): {timeline_text[:100]}..."
             )
+            
+            logger.info(f"Using system prompt: {system_prompt}")
 
             # Create prompt
             prompt = self._create_parsing_prompt(timeline_text, system_prompt)
