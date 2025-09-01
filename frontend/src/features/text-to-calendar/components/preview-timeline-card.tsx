@@ -9,7 +9,12 @@ import {
 	CardTitle,
 } from "@/shared/components/ui/card";
 import { DateInput, TimeField } from "@/shared/components/ui/datefield-rac";
-import { FormControl, FormField, FormItem } from "@/shared/components/ui/form";
+import {
+	FormControl,
+	FormField,
+	FormItem,
+	FormMessage,
+} from "@/shared/components/ui/form";
 import { Input } from "@/shared/components/ui/input";
 import { Label } from "@/shared/components/ui/label";
 import {
@@ -326,6 +331,7 @@ export default function PreviewTimelineCard({ idx }: Props) {
 													type="email"
 												/>
 											</FormControl>
+											<FormMessage />
 										</FormItem>
 									)}
 								/>
