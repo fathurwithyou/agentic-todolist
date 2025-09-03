@@ -9,6 +9,7 @@ from typing import List, Optional
 from datetime import datetime
 
 from app.schemas.events import ParsedEvent
+from app.domains.task.models import ParsedTask
 
 logger = logging.getLogger(__name__)
 
@@ -29,6 +30,11 @@ class LLMProvider(ABC):
     @abstractmethod
     async def parse_timeline(self, timeline_text: str, system_prompt: Optional[str] = None) -> List[ParsedEvent]:
         """Parse timeline text into structured events."""
+        pass
+
+    @abstractmethod
+    async def parse_timeline_for_tasks(self, timeline_text: str, system_prompt: Optional[str] = None) -> List[ParsedTask]:
+        """Parse timeline text into structured tasks."""
         pass
 
     @abstractmethod
@@ -118,6 +124,63 @@ IMPORTANT NOTES:
 - For conference links, extract the URL and determine type (video, phone, etc.)
 - If no conference data, set conferenceData to null
 - If no specific reminders mentioned, use default reminders (useDefault: true)
+
+Parse the timeline and return only the JSON response:
+"""
+
+    def _create_task_parsing_prompt(self, timeline_text: str, system_prompt: Optional[str] = None) -> str:
+        """Create a structured prompt for task parsing."""
+        context_section = ""
+        if system_prompt:
+            context_section = f"""
+ADDITIONAL CONTEXT:
+{system_prompt}
+
+Use this context to better understand the timeline and extract more accurate task information.
+
+"""
+        
+        return f"""
+You are an expert timeline parser specialized in extracting tasks and todos. Parse the following timeline text and extract structured task information.
+
+{context_section}TIMELINE TEXT:
+{timeline_text}
+
+INSTRUCTIONS:
+1. Extract all tasks, todos, action items, and deliverables
+2. Identify task priorities (urgent, high, medium, low)
+3. Extract due dates and deadlines
+4. Identify task dependencies and subtasks
+5. Extract task status (completed, in progress, pending)
+6. Look for keywords like: "todo", "task", "complete", "finish", "deliver", "deadline", "due"
+7. Handle priority indicators: "urgent", "high priority", "asap", "important"
+8. Convert dates to ISO format (YYYY-MM-DD)
+9. Convert times to 24-hour format (HH:MM)
+10. If no year is mentioned, assume current year ({datetime.now().year})
+11. Group related tasks and identify parent-child relationships
+
+REQUIRED OUTPUT FORMAT (JSON only, no other text):
+{{
+  "tasks": [
+    {{
+      "title": "Task Title",
+      "notes": "Detailed task description and context",
+      "due_date": "YYYY-MM-DD",
+      "due_time": "HH:MM",
+      "priority": "high|medium|low",
+      "completed": false,
+      "parent_task": null
+    }}
+  ]
+}}
+
+IMPORTANT NOTES:
+- priority should be one of: "high", "medium", "low" (default: "medium")
+- completed should be true if task is marked as done/completed/finished
+- parent_task should reference another task's title if this is a subtask
+- If no due date specified, set due_date to null
+- If no specific time, set due_time to null
+- Extract as much detail as possible in the notes field
 
 Parse the timeline and return only the JSON response:
 """

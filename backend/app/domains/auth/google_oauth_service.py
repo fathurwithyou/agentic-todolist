@@ -39,7 +39,8 @@ class GoogleOAuthService:
                     "https://www.googleapis.com/auth/userinfo.email",
                     "https://www.googleapis.com/auth/userinfo.profile", 
                     "openid",
-                    "https://www.googleapis.com/auth/calendar"
+                    "https://www.googleapis.com/auth/calendar",
+                    "https://www.googleapis.com/auth/tasks"
                 ]
             )
             flow.redirect_uri = self.redirect_uri
@@ -72,7 +73,8 @@ class GoogleOAuthService:
                         "https://www.googleapis.com/auth/userinfo.email",
                         "https://www.googleapis.com/auth/userinfo.profile",
                         "openid", 
-                        "https://www.googleapis.com/auth/calendar"
+                        "https://www.googleapis.com/auth/calendar",
+                        "https://www.googleapis.com/auth/tasks"
                     ]
                 )
                 flow.redirect_uri = self.redirect_uri

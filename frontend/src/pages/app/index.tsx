@@ -2,6 +2,7 @@
 import ApiKeyManagementCard from "@/features/api-key-management/components/api-key-management-card";
 import { SystemPromptManagementCard } from "@/features/system-prompt/components/system-prompt-management-card";
 import TextToCalendarCard from "@/features/text-to-calendar/components/text-to-calendar-card";
+import TextToTasksCard from "@/features/task-management/components/text-to-tasks-card";
 import Header from "@/shared/components/header";
 import {
 	Tabs,
@@ -10,7 +11,7 @@ import {
 	TabsTrigger,
 } from "@/shared/components/ui/tabs";
 import { useAuth } from "@/shared/hooks/use-auth";
-import { Calendar, Key, Settings } from "lucide-react";
+import { Calendar, CheckSquare, Key, Settings } from "lucide-react";
 import LandingPage from "../landing";
 import LoginPage from "../login"; // Import the login page
 
@@ -61,8 +62,13 @@ export default function AppPages() {
 						<TabsList className="glass w-full sm:w-auto p-1 rounded-md">
 							<TabsTrigger value="convert" className="gap-2 data-[state=active]:shadow-sm">
 								<Calendar className="w-4 h-4" />
-								<span className="hidden sm:inline">Convert</span>
-								<span className="sm:hidden">AI</span>
+								<span className="hidden sm:inline">Events</span>
+								<span className="sm:hidden">Events</span>
+							</TabsTrigger>
+							<TabsTrigger value="tasks" className="gap-2 data-[state=active]:shadow-sm">
+								<CheckSquare className="w-4 h-4" />
+								<span className="hidden sm:inline">Tasks</span>
+								<span className="sm:hidden">Tasks</span>
 							</TabsTrigger>
 							<TabsTrigger value="apikeys" className="gap-2 data-[state=active]:shadow-sm">
 								<Key className="w-4 h-4" />
@@ -78,6 +84,10 @@ export default function AppPages() {
 
 						<TabsContent value="convert" className="space-y-6 animate-in">
 							<TextToCalendarCard />
+						</TabsContent>
+
+						<TabsContent value="tasks" className="space-y-6 animate-in">
+							<TextToTasksCard />
 						</TabsContent>
 
 						<TabsContent value="apikeys" className="space-y-6 animate-in">

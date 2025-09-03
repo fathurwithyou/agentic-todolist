@@ -13,7 +13,7 @@ import uvicorn
 from app.utils.logging import setup_logging
 from app.config.settings import get_config
 from app.api.v1 import health  # Keep health check from v1
-from app.api import auth, calendar, api_keys, timeline
+from app.api import auth, calendar, api_keys, timeline, tasks
 
 
 # Set up logging
@@ -65,6 +65,9 @@ app.include_router(
 app.include_router(
     timeline.router, prefix="/api/v1"
 )  # Timeline API (/api/v1/timeline/*)
+app.include_router(
+    tasks.router, prefix="/api/v1"
+)  # Tasks API (/api/v1/tasks/*)
 
 # Serve static frontend files
 app.mount("/", StaticFiles(directory="../frontend/dist", html=True), name="static")
@@ -99,6 +102,14 @@ async def root():
             "POST /api/v1/calendar/google/events": "Create event in Google Calendar",
             "PUT /api/v1/calendar/google/events/{event_id}": "Update Google Calendar event",
             "DELETE /api/v1/calendar/google/events/{event_id}": "Delete Google Calendar event",
+            "GET /api/v1/tasks/lists": "List task lists",
+            "POST /api/v1/tasks/lists": "Create task list",
+            "GET /api/v1/tasks/{list_id}": "List tasks in a list",
+            "POST /api/v1/tasks/{list_id}/tasks": "Create task",
+            "PATCH /api/v1/tasks/{list_id}/tasks/{task_id}": "Update task",
+            "DELETE /api/v1/tasks/{list_id}/tasks/{task_id}": "Delete task",
+            "POST /api/v1/tasks/{list_id}/parse": "Parse timeline text into tasks",
+            "POST /api/v1/tasks/{list_id}/sync": "Sync tasks with Google Tasks",
             "GET /health": "Health check",
             "GET /docs": "API documentation",
         },

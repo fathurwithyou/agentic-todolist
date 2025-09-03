@@ -17,6 +17,7 @@ from app.domains.calendar.models import (
     ConferenceEntryPoint,
     Reminders,
 )
+from app.domains.task.models import ParsedTask, TaskPriority
 
 logger = logging.getLogger(__name__)
 
@@ -194,6 +195,68 @@ class GeminiProvider(LLMProvider):
         except json.JSONDecodeError as e:
             logger.error(f"Failed to parse Gemini JSON response: {e}")
             logger.error(f"Response was: {response_text}")
+            return []
+        except Exception as e:
+            logger.error(f"Gemini API error: {e}")
+            return []
+
+    async def parse_timeline_for_tasks(self, timeline_text: str, system_prompt: Optional[str] = None) -> List[ParsedTask]:
+        """Parse timeline using Gemini for tasks"""
+        if not self.is_available():
+            logger.error("Gemini provider not properly initialized")
+            return []
+
+        try:
+            logger.info(f"Parsing timeline for tasks with Gemini ({self.model_name}): {timeline_text[:100]}...")
+            
+            # Create task parsing prompt
+            prompt = self._create_task_parsing_prompt(timeline_text, system_prompt)
+            
+            # Generate response
+            response = await asyncio.to_thread(self.model.generate_content, prompt)
+            response_text = response.text.strip()
+            logger.info(f"Gemini task response: {response_text}")
+
+            # Extract JSON from response
+            json_start = response_text.find("{")
+            json_end = response_text.rfind("}") + 1
+
+            if json_start != -1 and json_end != -1:
+                json_text = response_text[json_start:json_end]
+                tasks_data = json.loads(json_text)
+            else:
+                logger.warning("No JSON found in response, trying to parse entire response")
+                tasks_data = json.loads(response_text)
+
+            # Convert to ParsedTask objects
+            parsed_tasks = []
+            for task_data in tasks_data.get("tasks", []):
+                try:
+                    priority = None
+                    if task_data.get("priority"):
+                        priority = TaskPriority(task_data["priority"])
+
+                    parsed_task = ParsedTask(
+                        title=task_data["title"],
+                        notes=task_data.get("notes"),
+                        priority=priority,
+                        due_date=task_data.get("due_date"),
+                        due_time=task_data.get("due_time"),
+                        completed=task_data.get("completed", False),
+                        parent_task=task_data.get("parent_task"),
+                    )
+                    parsed_tasks.append(parsed_task)
+                    logger.info(f"Parsed task: {parsed_task.title} (due: {parsed_task.due_date})")
+
+                except Exception as e:
+                    logger.error(f"Failed to parse task data {task_data}: {e}")
+                    continue
+
+            logger.info(f"Gemini parsed {len(parsed_tasks)} tasks successfully")
+            return parsed_tasks
+
+        except json.JSONDecodeError as e:
+            logger.error(f"Failed to parse Gemini JSON response: {e}")
             return []
         except Exception as e:
             logger.error(f"Gemini API error: {e}")

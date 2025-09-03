@@ -98,7 +98,7 @@ export default function PreviewTimelineForm({ onSuccess }: Props) {
 												<SelectValue placeholder={!hasApiKey ? "API key required" : "Select a model"} />
 											</SelectTrigger>
 										</FormControl>
-										<SelectContent>
+										<SelectContent side="bottom" align="start" className="max-h-60 overflow-y-auto">
 											{isLoadingModels && <SelectItem value="loading" disabled>Loading...</SelectItem>}
 											{models?.map((model) => (
 												<SelectItem key={model} value={model}>
