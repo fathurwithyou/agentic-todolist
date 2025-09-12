@@ -1,55 +1,31 @@
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import {
-	getListApiKeys,
-	getListProviders,
-	removeApiKey,
-	saveApiKey,
-	testApiKey,
-} from "./action";
-
-export const useGetListProvidersQuery = () => {
-	return useQuery({
-		queryKey: ["providers"],
-		queryFn: getListProviders,
-	});
-};
+import { useMutation, useQuery } from "@tanstack/react-query";
+import { getListApiKeys, saveApiKey, testApiKey, getListProviders } from "./action";
+import { type SaveApiKeyRequest } from "./dto";
 
 export const useGetListApiKeysQuery = () => {
-	return useQuery({
-		queryKey: ["api-keys"],
-		queryFn: getListApiKeys,
-	});
+  return useQuery({
+    queryKey: ["api-keys"],
+    queryFn: getListApiKeys,
+  });
 };
 
-export const useSaveApiKeyMutation = () => {
-	const qc = useQueryClient();
-
-	return useMutation({
-		mutationFn: saveApiKey,
-		onSuccess: () => {
-			qc.invalidateQueries({ queryKey: ["api-keys"] });
+export const useSaveApiKeyMutation = () =>
+	useMutation({
+		mutationFn: async (data: SaveApiKeyRequest) => {
+			return await saveApiKey(data);
 		},
 	});
-};
 
-export const useRemoveApiKeyMutation = () => {
-	const qc = useQueryClient();
-
-	return useMutation({
-		mutationFn: removeApiKey,
-		onSuccess: () => {
-			qc.invalidateQueries({ queryKey: ["api-keys"] });
+export const useTestApiKeyMutation = () =>
+	useMutation({
+		mutationFn: async (data: { provider: string }) => {
+			return await testApiKey(data);
 		},
 	});
-};
 
-export const useTestApiKeyMutation = () => {
-	const qc = useQueryClient();
-
-	return useMutation({
-		mutationFn: testApiKey,
-		onSuccess: () => {
-			qc.invalidateQueries({ queryKey: ["api-keys"] });
-		},
-	});
+export const useGetListProvidersQuery = () => {
+  return useQuery({
+    queryKey: ["api-providers"],
+    queryFn: getListProviders,
+  });
 };

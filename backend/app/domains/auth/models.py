@@ -22,6 +22,7 @@ class User:
     google_calendar_token: Optional[str] = None
     google_calendar_refresh_token: Optional[str] = None
     google_calendar_token_expiry: Optional[datetime] = None
+    system_prompt: Optional[str] = None
 
     def __post_init__(self):
         if self.created_at is None:

@@ -154,6 +154,33 @@ class LLMService:
             return self.PROVIDERS[provider].models
         return []
 
+    async def get_dynamic_provider_models(self, provider: ProviderType, api_key: str) -> List[str]:
+        """Get available models dynamically from provider API"""
+        if provider == ProviderType.GEMINI:
+            return await self._get_gemini_models(api_key)
+        else:
+            # Fallback to static list for other providers
+            return self.get_provider_models(provider)
+
+    async def _get_gemini_models(self, api_key: str) -> List[str]:
+        """Get Gemini models dynamically from API"""
+        import asyncio
+        import google.generativeai as genai
+        
+        def _fetch_models():
+            genai.configure(api_key=api_key)
+            models = genai.list_models()
+            return [model.name.replace("models/", "") for model in models if 'generateContent' in model.supported_generation_methods]
+        
+        try:
+            models = await asyncio.to_thread(_fetch_models)
+            logger.info(f"Fetched {len(models)} Gemini models dynamically")
+            return models
+        except Exception as e:
+            logger.error(f"Failed to fetch Gemini models dynamically: {e}")
+            # Fallback to static list
+            return self.PROVIDERS[ProviderType.GEMINI].models
+
     def _test_gemini_key(self, api_key: str) -> Dict:
         """Test Gemini API key"""
         import google.generativeai as genai

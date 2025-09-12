@@ -8,37 +8,20 @@ from typing import List, Optional
 from fastapi import APIRouter, HTTPException, Depends
 from pydantic import BaseModel
 
+from ..domains.calendar.models import TimelineParseRequest
+from ..domains.calendar.service import CalendarService
+from ..domains.calendar.user_service import create_user_calendar_service
 from ..domains.llm.service import LLMService
 from ..domains.llm.encryption import APIKeyEncryption
-from ..domains.calendar.service import CalendarService
-from ..domains.calendar.models import TimelineParseRequest
 from ..infrastructure.llm_repository import FileLLMRepository
-from ..services.user_calendar_service import create_user_calendar_service
 from .auth import get_current_user
 
 logger = logging.getLogger(__name__)
 
-# Initialize dependencies
+# Initialize LLM service
 llm_repository = FileLLMRepository()
 encryption = APIKeyEncryption()
 llm_service = LLMService(llm_repository, encryption)
-
-
-# For calendar service (reusing the same pattern as calendar.py)
-class InMemoryCalendarRepository:
-    def __init__(self):
-        self.events = []
-
-    def save_event(self, event):
-        self.events.append(event)
-        return event
-
-    def get_user_events(self, user_id):
-        return [e for e in self.events if e.user_id == user_id]
-
-
-calendar_repository = InMemoryCalendarRepository()
-calendar_service = CalendarService(calendar_repository, llm_service)
 
 router = APIRouter(prefix="/timeline", tags=["timeline"])
 
@@ -115,19 +98,60 @@ async def preview_timeline(
     """Preview timeline parsing without creating calendar events"""
 
     try:
-        # Create timeline parse request
-        parse_request = TimelineParseRequest(
-            user_id=current_user.user.user_id,
-            timeline_text=request.timeline_text,
-            flexible=request.flexible,
-            provider=request.llm_provider,
-            model=request.llm_model,
-            target_calendar_id=request.target_calendar_id,
+        
+        provider_type = None
+        if request.llm_provider:
+            try:
+                from ..domains.llm.models import ProviderType
+                provider_type = ProviderType(request.llm_provider.lower())
+            except ValueError:
+                raise HTTPException(
+                    status_code=400, 
+                    detail=f"Unsupported provider: {request.llm_provider}"
+                )
+        else:
+            provider_type = ProviderType.GEMINI  # Default
+        
+        api_key = llm_service.get_api_key(current_user.user.user_id, provider_type)
+        if not api_key:
+            raise HTTPException(
+                status_code=400,
+                detail=f"No API key found for {provider_type.value}. Please save your API key first."
+            )
+        
+        # Parse timeline using LLM provider directly
+        from ..providers.factory import LLMFactory
+        provider = LLMFactory.create_provider(
+            provider_name=provider_type.value,
+            api_key=api_key,
+            model_name=request.llm_model
         )
-
-        # Parse timeline using domain service
-        result = await calendar_service.parse_timeline(parse_request)
-
+        
+        if not provider:
+            raise HTTPException(
+                status_code=500, 
+                detail="Failed to create LLM provider"
+            )
+        
+        await provider.initialize()
+        if not provider.is_available():
+            raise HTTPException(
+                status_code=500,
+                detail="LLM provider not available"
+            )
+        
+        # Get user's system prompt
+        from ..infrastructure.auth_repository import FileAuthRepository
+        auth_repository = FileAuthRepository()
+        user = auth_repository.get_user(current_user.user.user_id)
+        system_prompt = user.system_prompt if user else None
+        
+        # Parse timeline
+        import time
+        start_time = time.time()
+        events = await provider.parse_timeline(request.timeline_text, system_prompt)
+        processing_time_ms = int((time.time() - start_time) * 1000)
+        
         # Convert to response format
         parsed_events = [
             ParsedEventResponse(
@@ -151,15 +175,15 @@ async def preview_timeline(
                 conferenceData=None,  # Simplified for now
                 sequence=event.sequence,
             )
-            for event in result.events
+            for event in events
         ]
 
         return TimelinePreviewResponse(
             parsed_events=parsed_events,
-            total_events=result.total_events,
-            used_provider=result.provider_used,
-            used_model=result.model_used,
-            processing_time_ms=result.processing_time_ms,
+            total_events=len(events),
+            used_provider=provider_type.value,
+            used_model=request.llm_model or provider.model_name,
+            processing_time_ms=processing_time_ms,
         )
 
     except ValueError as e:

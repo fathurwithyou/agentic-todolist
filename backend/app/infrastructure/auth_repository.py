@@ -45,6 +45,7 @@ class FileAuthRepository(AuthRepository):
             "google_calendar_token_expiry": user.google_calendar_token_expiry.isoformat()
             if user.google_calendar_token_expiry
             else None,
+            "system_prompt": user.system_prompt,
         }
 
         # Remove existing user with same ID
@@ -178,6 +179,32 @@ class FileAuthRepository(AuthRepository):
 
         return user_sessions
 
+    def get_user_credentials(self, user_id: str):
+        """Get Google credentials for user"""
+        user = self.get_user(user_id)
+        if not user or not user.google_calendar_token:
+            return None
+        
+        try:
+            from google.oauth2.credentials import Credentials
+            
+            credentials = Credentials(
+                token=user.google_calendar_token,
+                refresh_token=user.google_calendar_refresh_token,
+                token_uri="https://oauth2.googleapis.com/token",
+                client_id=None,  # Not needed for API calls
+                client_secret=None,  # Not needed for API calls
+            )
+            
+            if user.google_calendar_token_expiry:
+                credentials.expiry = user.google_calendar_token_expiry
+            
+            return credentials
+            
+        except Exception as e:
+            logger.error(f"Failed to create credentials for user {user_id}: {e}")
+            return None
+
     def _load_users(self) -> List[dict]:
         """Load users from file"""
         if not self.users_file.exists():
@@ -242,4 +269,5 @@ class FileAuthRepository(AuthRepository):
                 "google_calendar_refresh_token"
             ),
             google_calendar_token_expiry=google_calendar_token_expiry,
+            system_prompt=user_data.get("system_prompt"),
         )
