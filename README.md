@@ -4,12 +4,8 @@ An AI-powered task management application that intelligently organizes and prior
 
 ## Features
 
-- 🤖 **AI-Powered Task Management** - Intelligent task categorization and prioritization
-- 📅 **Smart Scheduling** - Automatic task scheduling based on deadlines and importance
-- 🔄 **Agentic Workflows** - Self-organizing task systems that adapt to your work patterns
-- 💬 **Natural Language Processing** - Add tasks using natural language descriptions
-- 📊 **Analytics Dashboard** - Track productivity patterns and task completion rates
-- 🔗 **Integration Ready** - Connect with your favorite productivity tools
+- **Agentic Calendar** - AI-powered calendar system that intelligently schedules and manages your appointments with automatic conflict resolution and smart time allocation
+- **TodoList** - Intelligent task management with natural language processing, automatic prioritization, and seamless integration with your calendar workflow
 
 ## Tech Stack
 
